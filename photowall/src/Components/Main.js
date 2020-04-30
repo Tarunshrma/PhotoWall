@@ -2,6 +2,7 @@ import React,{Component} from "react"
 import Header from "./Header"
 import PhotoWall from "./PhotoWall"
 import AddPhoto from "./AddPhoto"
+import { Route } from "react-router-dom";
 import "../styles/stylesheet.css"
 
 class Main extends Component{
@@ -23,19 +24,9 @@ class Main extends Component{
                 description: "On a vacation!",
                 imageLink: "https://fm.cnbc.com/applications/cnbc.com/resources/img/editorial/2017/08/24/104670887-VacationExplainsTHUMBWEB.1910x1000.jpg"
                 }],
-                
-                screen:"photos" //"photos","addPhoto"
         } 
 
         this.onPhotoRemove = this.onPhotoRemove.bind(this)
-        this.onNavigate = this.onNavigate.bind(this);
-    }
-
-    onNavigate(){
-        console.log("onNavigate");
-        this.setState({
-            screen: "addPhoto"
-        })
     }
 
     onPhotoRemove(photo){
@@ -50,24 +41,18 @@ class Main extends Component{
     }
 
     render(){
-      return <div>
-          {
-      this.state.screen === "addPhoto" && (
-          <div>
-              <AddPhoto/>
-          </div>
-      )
-      }
-      {
-          this.state.screen === "photos" && (
-         <div>
-             <Header title={'PhotoWall'}/>
-             <PhotoWall posts={this.state.posts} onPhotoRemove={this.onPhotoRemove} navigate={this.onNavigate}/>
-          </div> 
-          )
-      }
+      return(
+      <div>
+      <Route exact path="/" render={()=> (
+        <div>
+            <Header title={'PhotoWall'}/>
+            <PhotoWall posts={this.state.posts} onPhotoRemove={this.onPhotoRemove}/>
+        </div> 
+      )}/>
+      <Route path="/AddPhoto" component={AddPhoto}/>  
       </div>
-    }
+      )
+   }
   }
 
   export default Main;
