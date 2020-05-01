@@ -4,6 +4,7 @@ import PhotoWall from "./PhotoWall"
 import AddPhoto from "./AddPhoto"
 import { Route } from "react-router-dom";
 import "../styles/stylesheet.css"
+import {removePhoto} from "../redux/action"
 
 class Main extends Component{
     constructor(){
@@ -25,7 +26,8 @@ class Main extends Component{
     // }
 
     componentDidMount(){
-
+        //this.props.dispatch(removePhoto(2));
+        // this.props.removePhoto(2);
     }
 
     render(){
@@ -34,11 +36,10 @@ class Main extends Component{
       <Route exact path="/" render={()=> (
         <div>
             <Header title={'PhotoWall'}/>
-            <PhotoWall posts={this.props.posts}/>
+            <PhotoWall posts={this.props.posts} {...this.props}/>
             {/* <PhotoWall posts={this.state.posts} onPhotoRemove={this.onPhotoRemove}/> */}
         </div> 
       )}/>  
-
       {/* <Route path= "/AddPhoto" render = {({history}) => (
         <AddPhoto onAddPhoto={(addedPost) => {
             this.addPhoto(addedPost)

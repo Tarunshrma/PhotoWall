@@ -9,7 +9,7 @@ class PhotoWall extends Component{
         
         return<div>
                 <Link className="addIcon" to="/AddPhoto"/>
-                <div className="photoGrid">{this.props.posts.map((post,index)=> <Photo key={index} post={post}></Photo>)}) </div>
+                <div className="photoGrid">{this.props.posts.map((post,index)=> <Photo key={index} post={post} {...this.props} index={index}></Photo>)}) </div>
             </div>
     }
 }
