@@ -5,6 +5,9 @@ const postReducer = function posts(state = _posts, action) {
         case 'REMOVE_PHOTO':
             return [...state.slice(0,action.index), ...state.slice(action.index + 1)]
             break;
+        case 'ADD_PHOTO':
+            return [...state, action.photo]
+            break;    
         default: 
             return state;    
     }
