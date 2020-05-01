@@ -127,3 +127,50 @@ button:hover,.button:hover, button:focus, .button:focus {
     .form button:hover,.form button:active,.form button:focus {
     background: #7B8589;
    }
+
+   .single-photo {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    background: #fff;
+    border: black;
+   }
+   .single-photo .figure {
+    box-shadow: none;
+    margin: 0 2rem 0 0;
+    border: 0;
+    padding: 0;
+    flex: 1 0 60%;
+    max-width: 60%;
+   }
+   .single-photo .comments {
+    flex: 1 0 40%;
+    max-width: 40%;
+   }
+   .single-photo .photo {
+    width: 100%;
+    margin: 0;
+   }
+   .photo {
+    width: calc(100% + 4rem);
+    margin-left: -2rem;
+    margin-top: -2rem;
+    max-width: none;
+   }
+   .comment{
+    width: 100%
+   }
+   .comment p {
+    border-bottom: 1px solid #d3d3d3;
+    padding: 0.5rem 0;
+   }
+   .comment-form input,
+   .comment-form textarea {
+    width: 100%;
+    border: 0;
+    font-size: 1.3rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid #d3d3d3;
+    outline: none;
+    resize: vertical;
+   }

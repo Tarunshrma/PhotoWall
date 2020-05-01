@@ -4,6 +4,7 @@ import PhotoWall from "./PhotoWall"
 import AddPhoto from "./AddPhoto"
 import { Route } from "react-router-dom";
 import "../styles/stylesheet.css"
+import PhotoDetail from "./PhotoDetail"
 
 class Main extends Component{
 
@@ -19,6 +20,9 @@ class Main extends Component{
       <Route path= "/AddPhoto" render = {({history}) => (
         <AddPhoto {...this.props} history={history}/>
         )}/>
+        <Route path="/PhotoDetail/:id">
+          <PhotoDetail/>
+        </Route>
       </div>
       )
    }
