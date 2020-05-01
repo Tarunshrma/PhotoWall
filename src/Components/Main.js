@@ -4,12 +4,8 @@ import PhotoWall from "./PhotoWall"
 import AddPhoto from "./AddPhoto"
 import { Route } from "react-router-dom";
 import "../styles/stylesheet.css"
-import {removePhoto} from "../redux/action"
 
 class Main extends Component{
-    constructor(){
-        super();
-    }
 
     render(){
       return(
