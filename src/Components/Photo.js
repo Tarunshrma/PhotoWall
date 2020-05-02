@@ -16,8 +16,13 @@ class Photo extends Component{
                         if(this.props.history){
                             this.props.history.push('/');
                         }
-                        
                     }}>Remove</button>
+            <Link className="button" to={`/PhotoDetail/${photo.id}`}> 
+                <div className="comment-count"> 
+                <div className="speech-bubble"> </div>
+                    {this.props.comments[photo.id] ? this.props.comments[photo.id].length : 0 }
+                 </div>
+            </Link>
             </div>
         </figure>
     }

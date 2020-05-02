@@ -174,3 +174,20 @@ button:hover,.button:hover, button:focus, .button:focus {
     outline: none;
     resize: vertical;
    }
+
+   .speech-bubble {
+    background: url("https://d30y9cdsu7xlg0.cloudfront.net/png/51904-200.png") center no-repeat;
+    background-size: contain;
+    padding: 10px;
+    margin: 5px;
+    display: inline-block;
+    border: none;
+    position: relative;
+   }
+   .comment-count {
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: black
+   }
