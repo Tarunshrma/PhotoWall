@@ -11,7 +11,13 @@ class Photo extends Component{
             </Link>
             <figcaption><p>{photo.description}</p></figcaption>
             <div className="button-container">
-                <button className="button" onClick={()=>{this.props.removePhoto(this.props.index)}}>Remove</button>
+                <button className="button" onClick={()=>{
+                        this.props.removePhoto(this.props.index)
+                        if(this.props.history){
+                            this.props.history.push('/');
+                        }
+                        
+                    }}>Remove</button>
             </div>
         </figure>
     }

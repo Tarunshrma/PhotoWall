@@ -12,9 +12,10 @@ export function addPhoto(photo){
     }
 }
 
-export function addComment(comment){
+export function addComment(comment,photoId){
     return{
         type: 'ADD_COMMENT',
-        comment
+        comment,
+        photoId
     }
 }

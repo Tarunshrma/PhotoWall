@@ -9,9 +9,10 @@ class  PhotoComments extends Component{
     handleAddComment(event){
         event.preventDefault();
         const newComment = event.target.elements.comment.value;
-
+        const photoId = this.props.photoId;
         if(newComment !== ''){
-            this.props.addComment(newComment);
+            this.props.addComment(newComment,photoId);
+            event.target.elements.comment.value = "";
         }
     }
 

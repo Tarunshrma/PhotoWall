@@ -13,10 +13,14 @@ function posts(state = _posts, action) {
     }
 }
 
-function comments(state = [], action){
+function comments(state = {}, action){
     switch(action.type){
         case 'ADD_COMMENT':
-            return [...state,action.comment];
+            if (!state[action.photoId]) {
+                return {...state, [action.photoId]: [action.comment]}
+                } else {
+                return {...state, [action.photoId]: [...state[action.photoId], action.comment] }
+            }
         default: 
             return state; 
     }

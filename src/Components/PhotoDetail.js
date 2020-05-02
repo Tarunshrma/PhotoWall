@@ -12,10 +12,13 @@ class PhotoDetail extends Component{
         const photos = this.props.posts;
         const selectedPhotoId = Number(this.props.match.params.id);
         const photo = photos.find((photo) => photo.id === selectedPhotoId);
+
+        const comments = this.props.comments[this.props.match.params.id] || []
+        const index = this.props.posts.findIndex((post) => post.id === selectedPhotoId)
         
         return <div className="single-photo">
-             <Photo post={photo}/>
-             <PhotoComments comments={this.props.comments} addComment={this.props.addComment}/>
+             <Photo post={photo} {...this.props} index={index}/>
+             <PhotoComments comments={comments} addComment={this.props.addComment} photoId={selectedPhotoId}/>
         </div>
     }
 
