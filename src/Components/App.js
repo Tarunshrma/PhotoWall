@@ -5,7 +5,8 @@ import * as actions from "../redux/action"
 
 function mapStateToProps(state, ownProps) {
     return {
-        posts: state
+        posts: state.posts,
+        comments:state.comments
     }
 }
 

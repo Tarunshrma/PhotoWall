@@ -8,6 +8,10 @@ import PhotoDetail from "./PhotoDetail"
 
 class Main extends Component{
 
+  componentDidMount(){
+    console.log(this.props);
+}
+
     render(){
       return(
       <div>
