@@ -1,0 +1,14 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "add-post",
+    "type": "object",
+    "properties": {
+      "description": {
+        "type": "string"
+      },
+      "imageLink": {
+        "type": "string"
+      }
+    },
+    "required": ["description","imageLink"]
+  }

@@ -9,6 +9,7 @@ const postsTable = process.env.POSTS_TABLE
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   console.log('Processing event: ', event)
 
+  //TODO: Replace it with query as scan is lesss performant
   const result = await docClient.scan({
     TableName: postsTable
   }).promise()
