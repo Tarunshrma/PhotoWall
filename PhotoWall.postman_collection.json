@@ -1,0 +1,109 @@
+{
+	"info": {
+		"_postman_id": "2f93bc25-ec19-4b62-86a6-3ccb00e06a18",
+		"name": "PhotoWall",
+		"description": "This is postman colletion for Photowall application. ",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GetPosts",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://{{appId}}.execute-api.ap-south-1.amazonaws.com/{{stage}}/posts",
+					"protocol": "https",
+					"host": [
+						"{{appId}}",
+						"execute-api",
+						"ap-south-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"{{stage}}",
+						"posts"
+					]
+				},
+				"description": "Retrieve the posts."
+			},
+			"response": []
+		},
+		{
+			"name": "AddPost",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"description\": \"Pikachu\",\n  \"imageLink\": \"https://pm1.narvii.com/6014/efd2d51a3fc930666b2dd5795779c868e1afbd61_00.jpg\"\n}"
+				},
+				"url": {
+					"raw": "https://{{appId}}.execute-api.ap-south-1.amazonaws.com/{{stage}}/posts",
+					"protocol": "https",
+					"host": [
+						"{{appId}}",
+						"execute-api",
+						"ap-south-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"{{stage}}",
+						"posts"
+					]
+				},
+				"description": "Add new post with image link and description"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "4766dd54-bc49-4c93-ab76-07b8570e2aa7",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "8fc95e96-c166-483a-9b01-0056ab084b23",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "fdc4a025-650f-4a0d-be1b-8087b8634377",
+			"key": "appId",
+			"value": "pq1txc8ozd",
+			"type": "string"
+		},
+		{
+			"id": "166057f7-da04-4d5c-b59c-777ab968ba5a",
+			"key": "stage",
+			"value": "dev",
+			"type": "string"
+		}
+	]
+}
