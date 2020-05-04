@@ -24,6 +24,7 @@ provider:
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
     POSTS_TABLE: tblPosts-${self:provider.stage}
     COMMENTS_TABLE: tblComments-${self:provider.stage}
+    COMMENTS_INDEX: CommentIdIndex
 
   stage: ${opt:stage,'dev'}
   region: ${opt:region,'ap-south-1'}
@@ -42,6 +43,12 @@ provider:
         - dynamodb:Query
       Resource:
         - "Fn::GetAtt": [CommentsTable, Arn]
+
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+      Resource:
+        - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.COMMENTS_TABLE}/index/${self:provider.environment.COMMENTS_INDEX}
 
 functions:
   GetPosts:
@@ -72,6 +79,14 @@ functions:
           path: posts/{postId}/comments
           cors: true
 
+  GetCommentsById:
+    handler: src/lambda/http/getCommentById.handler
+    events:
+      - http:
+          method: get
+          path: comments/{commentId}
+          cors: true
+
 resources:
   Resources:
     PostsTable:
@@ -96,8 +111,20 @@ resources:
             AttributeType: S
           - AttributeName: timestamp
             AttributeType: S
+          - AttributeName: commentId
+            AttributeType: S
         KeySchema:
           - AttributeName: postId
             KeyType: HASH
           - AttributeName: timestamp
             KeyType: RANGE
+        GlobalSecondaryIndexes:
+          - IndexName: ${self:provider.environment.COMMENTS_INDEX}
+            KeySchema:
+              - AttributeName: commentId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+
+
+
