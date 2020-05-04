@@ -1,0 +1,11 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "add-comment",
+    "type": "object",
+    "properties": {
+      "comment": {
+        "type": "string"
+      }
+    },
+    "required": ["comment"]
+  }

@@ -41,6 +41,7 @@ provider:
     - Effect: Allow
       Action:
         - dynamodb:Query
+        - dynamodb:PutItem
       Resource:
         - "Fn::GetAtt": [CommentsTable, Arn]
 
@@ -78,6 +79,18 @@ functions:
           method: get
           path: posts/{postId}/comments
           cors: true
+
+  AddComments:
+    handler: src/lambda/http/addComment.handler
+    events:
+      - http:
+          method: post
+          path: posts/{postId}/comments
+          cors: true  
+          request:
+            # Schema that will be used to validate incoming requests
+            schema:
+              application/json: ${file(models/add-comment-model.json)}
 
   GetCommentsById:
     handler: src/lambda/http/getCommentById.handler
