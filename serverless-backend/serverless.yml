@@ -23,6 +23,7 @@ provider:
   environment:
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
     POSTS_TABLE: tblPosts-${self:provider.stage}
+    COMMENTS_TABLE: tblComments-${self:provider.stage}
 
   stage: ${opt:stage,'dev'}
   region: ${opt:region,'ap-south-1'}
@@ -32,8 +33,15 @@ provider:
       Action:
         - dynamodb:Scan
         - dynamodb:PutItem
+        - dynamodb:GetItem
       Resource:
-        - "Fn::GetAtt": [ PostsTable, Arn ]  
+        - "Fn::GetAtt": [ PostsTable, Arn ]
+    
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+      Resource:
+        - "Fn::GetAtt": [CommentsTable, Arn]
 
 functions:
   GetPosts:
@@ -56,6 +64,13 @@ functions:
             schema:
               application/json: ${file(models/add-post-model.json)}
 
+  GetComments:
+    handler: src/lambda/http/getComments.handler
+    events:
+      - http:
+          method: get
+          path: posts/{postId}/comments
+          cors: true
 
 resources:
   Resources:
@@ -70,3 +85,19 @@ resources:
         KeySchema:
           - AttributeName: postId
             KeyType: HASH
+    
+    CommentsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.COMMENTS_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: postId
+            AttributeType: S
+          - AttributeName: timestamp
+            AttributeType: S
+        KeySchema:
+          - AttributeName: postId
+            KeyType: HASH
+          - AttributeName: timestamp
+            KeyType: RANGE
