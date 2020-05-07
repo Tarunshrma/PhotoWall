@@ -5,10 +5,7 @@
     "properties": {
       "description": {
         "type": "string"
-      },
-      "imageLink": {
-        "type": "string"
       }
     },
-    "required": ["description","imageLink"]
+    "required": ["description"]
   }
