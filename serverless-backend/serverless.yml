@@ -109,6 +109,9 @@ functions:
           path: comments/{commentId}
           cors: true
 
+  SendNotifications:
+    handler: src/lambda/s3/sendNotifications.handler
+
 resources:
   Resources:
     PostsTable:
@@ -152,6 +155,11 @@ resources:
       Type: AWS::S3::Bucket
       Properties:
         BucketName: ${self:provider.environment.POST_IMAGES_S3_BUCKET}
+        NotificationConfiguration:
+          LambdaConfigurations:
+            - Event: s3:ObjectCreated:*
+              Function: !GetAtt SendNotificationsLambdaFunction.Arn
+
         CorsConfiguration:
           CorsRules:
             -
@@ -166,6 +174,17 @@ resources:
                 - DELETE
                 - HEAD
               MaxAge: 3000
+        
+    SendNotificationsPermission:
+      Type: AWS::Lambda::Permission
+      Properties: 
+        FunctionName: 
+          Ref: SendNotificationsLambdaFunction
+        Principal: s3.amazonaws.com
+        Action: lambda:InvokeFunction
+        SourceAccount:
+          Ref: AWS::AccountId
+        SourceArn: arn:aws:s3:::${self:provider.environment.POST_IMAGES_S3_BUCKET}
 
     BucketPolicy:
       Type: AWS::S3::BucketPolicy
