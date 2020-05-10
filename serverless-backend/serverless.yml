@@ -31,6 +31,7 @@ provider:
     COMMENTS_INDEX: CommentIdIndex
     POST_IMAGES_S3_BUCKET: photowall-posts-images-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
+    POST_IMAGES_THUMBNAILS_S3_BUCKET: photowall-posts-images-thumbnail-${self:provider.stage}
 
 
   stage: ${opt:stage,'dev'}
@@ -63,6 +64,11 @@ provider:
         - s3:PutObject
         - s3:GetObject
       Resource: arn:aws:s3:::${self:provider.environment.POST_IMAGES_S3_BUCKET}/*
+
+    - Effect: Allow
+      Action:
+        - s3:PutObject
+      Resource: "arn:aws:s3:::${self:provider.environment.POST_IMAGES_THUMBNAILS_S3_BUCKET}/*"
 
     - Effect: Allow
       Action:
@@ -127,6 +133,19 @@ functions:
       API_ID:
         Ref: WebsocketsApi
     handler: src/lambda/s3/sendNotifications.handler
+    events:
+      - sns:
+          arn:
+            Fn::Join:
+              - ':'
+              - - arn:aws:sns
+                - Ref: AWS::Region
+                - Ref: AWS::AccountId
+                - ${self:custom.topicName}
+          topicName: ${self:custom.topicName}
+
+  ResizeImage:
+    handler: src/lambda/s3/resizeImage.handler
     events:
       - sns:
           arn:
@@ -317,5 +336,11 @@ resources:
                 AWS: '*'
               Action: 'es:*'
               Resource: '*'
+              
+    ThumbnailsBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.POST_IMAGES_THUMBNAILS_S3_BUCKET}
+
 
 
