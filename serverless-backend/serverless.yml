@@ -12,6 +12,7 @@ custom:
 # Add the serverless-webpack plugin
 plugins:
   - serverless-webpack
+  - serverless-websockets-plugin
 
 provider:
   name: aws
@@ -24,6 +25,7 @@ provider:
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
     POSTS_TABLE: tblPosts-${self:provider.stage}
     COMMENTS_TABLE: tblComments-${self:provider.stage}
+    CONNECTION_TABLE: tblConnections-${self:provider.stage}
     COMMENTS_INDEX: CommentIdIndex
     POST_IMAGES_S3_BUCKET: photowall-posts-images-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
@@ -59,6 +61,14 @@ provider:
         - s3:PutObject
         - s3:GetObject
       Resource: arn:aws:s3:::${self:provider.environment.POST_IMAGES_S3_BUCKET}/*
+
+    - Effect: Allow
+      Action:
+        - dynamodb:Scan
+        - dynamodb:PutItem
+        - dynamodb:DeleteItem
+      Resource:
+        - "Fn::GetAtt": [ WebSocketConnectionsDynamoDBTable, Arn ]
     
 functions:
   GetPosts:
@@ -112,6 +122,18 @@ functions:
   SendNotifications:
     handler: src/lambda/s3/sendNotifications.handler
 
+  ConnectHandler:
+    handler: src/lambda/websocket/connect.handler
+    events:
+      - websocket:
+          route: $connect
+
+  DisconnectHandler:
+    handler: src/lambda/websocket/disconnect.handler
+    events:
+      - websocket:
+          route: $disconnect
+
 resources:
   Resources:
     PostsTable:
@@ -150,6 +172,21 @@ resources:
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
+
+    WebSocketConnectionsDynamoDBTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: id
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:provider.environment.CONNECTION_TABLE}
+
 
     AttachmentsBucket:
       Type: AWS::S3::Bucket
