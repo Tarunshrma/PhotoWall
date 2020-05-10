@@ -138,6 +138,13 @@ functions:
       - websocket:
           route: $disconnect
 
+  SyncWithElasticSearch:
+    handler: src/lambda/dynamoDb/elasticSearchSync.handler
+    events:
+      - stream:
+          type: dynamodb
+          arn: !GetAtt PostsTable.StreamArn
+
 resources:
   Resources:
     PostsTable:
@@ -151,6 +158,8 @@ resources:
         KeySchema:
           - AttributeName: postId
             KeyType: HASH
+        StreamSpecification:
+          StreamViewType: NEW_IMAGE
     
     CommentsTable:
       Type: AWS::DynamoDB::Table
