@@ -120,6 +120,10 @@ functions:
           cors: true
 
   SendNotifications:
+    environment:
+      STAGE: ${self:provider.stage}
+      API_ID:
+        Ref: WebsocketsApi
     handler: src/lambda/s3/sendNotifications.handler
 
   ConnectHandler:
