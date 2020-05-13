@@ -2,11 +2,14 @@ import { APIGatewayProxyHandler, APIGatewayProxyEvent, APIGatewayProxyResult } f
 import 'source-map-support/register'
 import * as AWS  from 'aws-sdk'
 
+import * as middy from 'middy'
+import { cors } from 'middy/middlewares'
+
 const docClient = new AWS.DynamoDB.DocumentClient()
 
 const postsTable = process.env.POSTS_TABLE
 
-export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   console.log('Processing event: ', event)
 
   //TODO: Replace it with query as scan is lesss performant
@@ -18,11 +21,14 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
 
   return {
     statusCode: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*'
-    },
     body: JSON.stringify({
         posts
     })
   }
-}
+})
+
+handler.use(
+  cors({
+    credentials: true
+  })
+)

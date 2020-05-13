@@ -2,6 +2,7 @@ import { APIGatewayProxyHandler, APIGatewayProxyEvent, APIGatewayProxyResult } f
 import 'source-map-support/register'
 import * as AWS  from 'aws-sdk'
 import * as uuid from 'uuid'
+import {getUserIdFromToken} from '../../utils/utils'
 
 const docClient = new AWS.DynamoDB.DocumentClient()
 const s3 = new AWS.S3({
@@ -19,10 +20,14 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
   const postId = uuid.v4();
   const imageId = uuid.v4();
 
+  const authToken = event.headers.Authorization;
+  const userId = getUserIdFromToken(authToken);
+
   const url = getUploadUrl(imageId)
 
   const newPost = {
       postId: postId,
+      userId: userId,
       ImageUrl: `https://${bucketName}.s3.amazonaws.com/${imageId}`,
       ...parsedBody
   }

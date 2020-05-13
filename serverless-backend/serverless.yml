@@ -33,7 +33,6 @@ provider:
     SIGNED_URL_EXPIRATION: 300
     POST_IMAGES_THUMBNAILS_S3_BUCKET: photowall-posts-images-thumbnail-${self:provider.stage}
 
-
   stage: ${opt:stage,'dev'}
   region: ${opt:region,'ap-south-1'}
   
