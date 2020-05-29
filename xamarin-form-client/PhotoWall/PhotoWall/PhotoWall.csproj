@@ -1,0 +1,63 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>portable</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Xamarin.Forms" Version="4.4.0.991265" />
+    <PackageReference Include="Xamarin.Essentials" Version="1.3.1" />
+    <PackageReference Include="Prism.DryIoc.Forms" Version="7.2.0.1422" />
+    <PackageReference Include="MonkeyCache" Version="1.3.0" />
+    <PackageReference Include="MonkeyCache.SQLite" Version="1.3.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Views\" />
+    <Folder Include="ViewModels\" />
+    <Folder Include="Core\" />
+    <Folder Include="Services\" />
+    <Folder Include="Core\APIClient\" />
+    <Folder Include="Core\APIClient\Interface\" />
+    <Folder Include="Core\Loggers\" />
+    <Folder Include="Core\Configurations\" />
+    <Folder Include="Exceptions\" />
+    <Folder Include="Services\Base\" />
+    <Folder Include="Helpers\" />
+    <Folder Include="Enums\" />
+    <Folder Include="Convertors\" />
+    <Folder Include="Utils\" />
+    <Folder Include="Constants\" />
+    <Folder Include="Resources\" />
+    <Folder Include="Resources\Resx\" />
+    <Folder Include="Views\Templates\" />
+    <Folder Include="Database\" />
+    <Folder Include="Database\NoSQLCache\" />
+    <Folder Include="Testing\" />
+    <Folder Include="Services\Navigation\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Core\Configurations\config.json" />
+    <EmbeddedResource Include="Core\Configurations\config.prod.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\Resx\AppResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>AppResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Resources\Resx\AppResources.Designer.cs">
+      <DependentUpon>AppResources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Core\Configurations\config.json" />
+    <None Remove="Core\Configurations\config.prod.json" />
+  </ItemGroup>
+</Project>
