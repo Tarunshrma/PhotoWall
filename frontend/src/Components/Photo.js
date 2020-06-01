@@ -6,8 +6,8 @@ class Photo extends Component{
     render(){
         const photo = this.props.post;
         return <figure className="figure">
-            <Link to={`/PhotoDetail/${photo.id}`}>
-                <img className="photo" src={photo.imageLink} alt={photo.description}></img>
+            <Link to={`/PhotoDetail/${photo.postId}`}>
+                <img className="photo" src={photo.ImageUrl} alt={photo.description}></img>
             </Link>
             <figcaption><p>{photo.description}</p></figcaption>
             <div className="button-container">
@@ -17,10 +17,10 @@ class Photo extends Component{
                             this.props.history.push('/');
                         }
                     }}>Remove</button>
-            <Link className="button" to={`/PhotoDetail/${photo.id}`}> 
+            <Link className="button" to={`/PhotoDetail/${photo.postId}`}> 
                 <div className="comment-count"> 
                 <div className="speech-bubble"> </div>
-                    {this.props.comments[photo.id] ? this.props.comments[photo.id].length : 0 }
+                    {this.props.comments[photo.postId] ? this.props.comments[photo.postId].length : 0 }
                  </div>
             </Link>
             </div>

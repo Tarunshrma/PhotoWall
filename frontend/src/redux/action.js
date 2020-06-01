@@ -5,6 +5,13 @@ export function removePhoto(index){
     }
 }
 
+export function fetchPhotos(photos){
+    return{
+        type: 'FETCH_PHOTOS',
+        photos
+    }
+}
+
 export function addPhoto(photo){
     return{
         type: 'ADD_PHOTO',

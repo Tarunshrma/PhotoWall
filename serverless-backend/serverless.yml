@@ -96,7 +96,7 @@ functions:
           method: post
           path: posts
           cors: true
-          authorizer: Auth
+          # authorizer: Auth
           request:
             # Schema that will be used to validate incoming requests
             schema:
