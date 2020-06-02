@@ -15,3 +15,15 @@ export async function getAllPosts(idToken: string): Promise<Posts[]> {
     console.log('Posts:', response.data)
     return response.data.posts
   }
+
+  export async function deletePost(idToken: string, postId: string): Promise<void> {
+    console.log('Fetching posts')
+  
+    const response = await Axios.delete(`${apiEndpoint}/posts/${postId}`, {
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     'Authorization': `Bearer ${idToken}`
+    //   },
+    })
+    console.log('Posts deleted:', response.data)
+  }
