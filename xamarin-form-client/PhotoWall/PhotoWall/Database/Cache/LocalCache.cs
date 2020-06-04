@@ -3,6 +3,7 @@ using System.IO;
 using MonkeyCache;
 using MonkeyCache.SQLite;
 using Xamarin.Essentials;
+using PhotoWall.Database.Cache.Interface;
 
 namespace PhotoWall.Database.NoSQLCache
 {

@@ -29,8 +29,8 @@ namespace PhotoWall.Services.Interface
         /// <param name="authToken"></param>
         /// <param name="cancallationToken"></param>
         /// <returns></returns>
-        Task<TResponse> GetAsync<TResponse>(string apiPath, string authToken = "", bool forceRefresh = true, CancellationToken cancallationToken = default);
-        // where TResponse : IResponseModel;
+        Task<TResponse> GetAsync<TResponse>(string apiPath, string authToken = "", bool forceRefresh = false, bool cacheSecurely = false, CancellationToken cancallationToken = default)
+            where TResponse : IResponseModel;
 
         /// <summary>
         /// Get API calls with querry paramteres
@@ -42,7 +42,8 @@ namespace PhotoWall.Services.Interface
         /// <param name="authToken"></param>
         /// <param name="cancallationToken"></param>
         /// <returns></returns>
-        Task<TResponse> GetAsync<TRequest, TResponse>(string apiPath, TRequest requestModel, string authToken = "", bool forceRefresh = true, CancellationToken cancallationToken = default);
+        Task<TResponse> GetAsync<TRequest, TResponse>(string apiPath, TRequest requestModel, string authToken = "", bool forceRefresh = false, bool cacheSecurely = false, CancellationToken cancallationToken = default)
+                where TResponse : IResponseModel;
 
         /// <summary>
         /// Post API Calls with body parameeters
@@ -54,7 +55,7 @@ namespace PhotoWall.Services.Interface
         /// <param name="authToken"></param>
         /// <param name="cancallationToken"></param>
         /// <returns></returns>
-        Task<TResponse> PostAsync<TResponse, TRequest>(string apiPath, TRequest requestModel, string authToken = "", bool forceRefresh = true, CancellationToken cancallationToken = default);
+        Task<TResponse> PostAsync<TResponse, TRequest>(string apiPath, TRequest requestModel, string authToken = "", bool forceRefresh = true, bool cacheSecurely = false, CancellationToken cancallationToken = default);
 
     }
 }

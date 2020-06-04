@@ -24,7 +24,7 @@ namespace PhotoWall.Testing
 
             try
             {
-                var data = await _restAPIClient.GetAsync<PhotoWallPosts>(url, authToken);
+                var data = await _restAPIClient.GetAsync<PhotoWallPosts>(url, authToken, false, true);
                 _logger.Log("Data Reciieved");
                 return data;
             }

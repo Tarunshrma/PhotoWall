@@ -11,6 +11,13 @@ using PhotoWall.Testing;
 using PhotoWall.ViewModels;
 using PhotoWall.Views;
 using Xamarin.Forms;
+using PhotoWall.Database.Cache.Interface;
+using PhotoWall.Core.Security;
+using PhotoWall.Database.Cache;
+using PhotoWall.Analytics;
+using Xamarin.Essentials.Interfaces;
+using Xamarin.Essentials.Implementation;
+using Xamarin.Essentials;
 
 namespace PhotoWall
 {
@@ -54,17 +61,26 @@ namespace PhotoWall
             containerRegistry.RegisterForNavigation<NavigationPage>();
             containerRegistry.RegisterForNavigation<HomeView, HomeViewModel>();
 
-            RegisterServices(containerRegistry);
+            RegisterServices();
+            RegisterXamarinEssentialServices();
         }
 
-        private void RegisterServices(IContainerRegistry containerRegistry)
+        private void RegisterServices()
         {
             //containerRegistry.RegisterSingleton<ICustomNavigationService, CustomNavigationService>();
-            containerRegistry.RegisterSingleton<ILogger, Logger>();
-            containerRegistry.RegisterSingleton<ILocalCache, LocalCache>();
-            containerRegistry.RegisterSingleton<IRestAPIClient, RestAPIClient>();
+            IOCContainer.RegisterSingleton<ILogger, Logger>();
+            IOCContainer.RegisterSingleton<ILocalCache, LocalCache>();
+            IOCContainer.RegisterSingleton<ISecureCache, SecureCache>();
+            IOCContainer.RegisterSingleton<IEncryptionService, EncryptionService>();
+            IOCContainer.RegisterSingleton<IRestAPIClient, RestAPIClient>();
+            IOCContainer.RegisterSingleton<IAnalyticsService, AnalyticsService>();
 
-            containerRegistry.Register<IPhotoService, PhotoService>();
+            IOCContainer.Register<IPhotoService, PhotoService>();
+        }
+
+        private void RegisterXamarinEssentialServices()
+        {
+            IOCContainer.Register<IConnectivity, ConnectivityImplementation>();
         }
     }
 }

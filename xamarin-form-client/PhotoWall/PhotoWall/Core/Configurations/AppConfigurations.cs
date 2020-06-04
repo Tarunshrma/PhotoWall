@@ -8,8 +8,6 @@ using PhotoWall.Helpers;
 using Xamarin.Forms;
 
 
-
-
 namespace PhotoWall.Core.Configurations
 {
     public class AppConfigurations

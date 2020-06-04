@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Prism.Commands;
 using PhotoWall.Core.Loggers;
 using PhotoWall.Testing;
+using PhotoWall.Core.Commands;
 
 namespace PhotoWall.ViewModels
 {
@@ -11,13 +12,13 @@ namespace PhotoWall.ViewModels
     {
         private readonly IPhotoService _photoService;
 
-        public DelegateCommand FetchPhotosCommand { get; private set; }
+        public CustomCommand FetchPhotosCommand { get; private set; }
 
         public HomeViewModel(IPhotoService photoService)
         {
             _photoService = photoService;
 
-            FetchPhotosCommand = new DelegateCommand(async () => await FetchPhotos());
+            FetchPhotosCommand = new CustomCommand(async () => await FetchPhotos());
         }
 
         private async Task FetchPhotos()

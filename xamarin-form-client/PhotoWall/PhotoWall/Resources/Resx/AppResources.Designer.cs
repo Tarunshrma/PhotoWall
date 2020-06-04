@@ -52,5 +52,11 @@ namespace PhotoWall.Resources.Resx {
                 return ResourceManager.GetString("Title", resourceCulture);
             }
         }
+        
+        internal static string No_Internet {
+            get {
+                return ResourceManager.GetString("No_Internet", resourceCulture);
+            }
+        }
     }
 }

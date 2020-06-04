@@ -60,12 +60,12 @@ namespace PhotoWall.ViewModels
             }
         }
 
-        public void OnNavigatedFrom(INavigationParameters parameters)
+        virtual public void OnNavigatedFrom(INavigationParameters parameters)
         {
 
         }
 
-        public void OnNavigatedTo(INavigationParameters parameters)
+        virtual public void OnNavigatedTo(INavigationParameters parameters)
         {
 
         }

@@ -11,10 +11,13 @@ using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using PhotoWall.Core.APIClient.Interface;
 using PhotoWall.Core.Loggers;
-using PhotoWall.Database.NoSQLCache;
+using PhotoWall.Database.Cache;
+using PhotoWall.Database.Cache.Interface;
 using PhotoWall.Exceptions;
+using PhotoWall.Resources.Resx;
 using PhotoWall.Services.Interface;
 using Xamarin.Essentials;
+using Xamarin.Essentials.Interfaces;
 
 namespace PhotoWall.Services.APIClient
 {
@@ -24,15 +27,16 @@ namespace PhotoWall.Services.APIClient
         private readonly JsonSerializerSettings _serializerSettings;
         private readonly ILogger _logger;
         private readonly ILocalCache _localCache;
+        private readonly IConnectivity _connectivity;
+        private readonly IHttpClientProvider _httpClientProvider;
 
 
         public long HttpTimeOut { get; set; } = 30000;
+        public long CaheExpiration { get; set; } = 24 * 60 * 60 * 1000;
 
         //Set cache expiration to 1 hour
-        public long CaheExpiration { get; set; } = 60 * 60 * 1000;
 
-
-        public RestAPIClient(ILogger logger, ILocalCache localCache)
+        public RestAPIClient(ILogger logger, ILocalCache localCache, IConnectivity connectivity, IHttpClientProvider httpClientProvider)
         {
             _serializerSettings = new JsonSerializerSettings
             {
@@ -44,6 +48,8 @@ namespace PhotoWall.Services.APIClient
             _serializerSettings.Converters.Add(new StringEnumConverter());
             _localCache = localCache;
             _logger = logger;
+            _connectivity = connectivity;
+            _httpClientProvider = httpClientProvider;
 
         }
 
@@ -62,24 +68,41 @@ namespace PhotoWall.Services.APIClient
             }
         }
 
-        public async Task<TResponse> GetAsync<TResponse>(string apiPath, string authToken = "", bool forceRefresh = true, CancellationToken cancallationToken = default) //where TResponse : IResponseModel
+        public async Task<TResponse> GetAsync<TResponse>(string apiPath, string authToken = "", bool forceRefresh = false, bool cacheSecurely = false, CancellationToken cancallationToken = default)
+                    where TResponse : IResponseModel
         {
             try
             {
-                //Check for local cache
-                if (Connectivity.NetworkAccess != NetworkAccess.Internet &&
-                                        !_localCache.IsExpired(key: apiPath))
+                TResponse cachedResponse = CacheManager.Instance().GetApiResponse<TResponse>(apiPath, cacheSecurely);
+
+                //If no internet connection 
+                if (_connectivity.NetworkAccess != NetworkAccess.Internet)
                 {
-                    await Task.Yield();
-                    return _localCache.Get<TResponse>(key: apiPath);
+                    //and valid cache data is available then return it
+                    if (cachedResponse != null && !forceRefresh)
+                    {
+                        await Task.Yield();
+                        return cachedResponse;
+                    }
+                    else
+                    {
+                        throw new HttpRequestExceptionEx(HttpStatusCode.BadGateway, AppResources.No_Internet);
+                    }
                 }
 
                 using (var client = CreateHttpClient(apiPath, authToken))
                 {
-                    using (var requestMessage = GetHttpRequest(apiPath, HttpMethod.Get))
+                    using (var requestMessage = GetHttpRequest(apiPath, HttpMethod.Get, null, cachedResponse?.Etag))
                     {
                         var response = await client.SendAsync(requestMessage, cancallationToken).ConfigureAwait(false);
                         await HandleResponse(response);
+
+                        //If there is no change in api response then just return the cached response
+                        if (response.StatusCode == HttpStatusCode.NotModified)
+                        {
+                            _logger.Log($"No new content available returning cahced response : {cachedResponse} ");
+                            return cachedResponse;
+                        }
 
                         string serializedResponse = await response.Content.ReadAsStringAsync();
 
@@ -88,8 +111,15 @@ namespace PhotoWall.Services.APIClient
                         TResponse result = await Task.Run(() =>
                             JsonConvert.DeserializeObject<TResponse>(serializedResponse, _serializerSettings));
 
-                        //Saves the cache and pass it a timespan for expiration
-                        _localCache.Set(key: apiPath, data: result, tag: null, timeSpan: TimeSpan.FromMilliseconds(CaheExpiration));
+                        ///Saves the cache and pass it a timespan for expiration
+                        // If a ETag is provided with the response, cache it for future requests
+                        if (!string.IsNullOrWhiteSpace(response.Headers.ETag?.Tag))
+                        {
+                            result.Etag = response.Headers.ETag?.Tag;
+                        }
+
+                        //_localCache.Set(key: apiPath, data: result, tag: null, timeSpan: TimeSpan.FromMilliseconds(CaheExpiration));
+                        CacheManager.Instance().SaveApiResponse<TResponse>(apiPath, result, TimeSpan.FromMilliseconds(CaheExpiration), cacheSecurely);
 
                         return result;
                     }
@@ -106,27 +136,45 @@ namespace PhotoWall.Services.APIClient
             }
         }
 
-        public async Task<TResponse> GetAsync<TRequest, TResponse>(string apiPath, TRequest requestModel, string authToken = "", bool forceRefresh = true, CancellationToken cancallationToken = default)
+        public async Task<TResponse> GetAsync<TRequest, TResponse>(string apiPath, TRequest requestModel, string authToken = "", bool forceRefresh = false, bool cacheSecurely = false, CancellationToken cancallationToken = default)
+                where TResponse : IResponseModel
         {
             try
             {
-                //Check for local cache
-                if (Connectivity.NetworkAccess != NetworkAccess.Internet &&
-                    !_localCache.IsExpired(key: apiPath))
-                {
-                    await Task.Yield();
+                TResponse cachedResponse = CacheManager.Instance().GetApiResponse<TResponse>(apiPath, cacheSecurely);
 
-                    return _localCache.Get<TResponse>(key: apiPath);
+                //If no internet connection 
+                if (_connectivity.NetworkAccess != NetworkAccess.Internet)
+                {
+                    //and valid cache data is available then return it
+                    if (cachedResponse != null && !forceRefresh)
+                    {
+                        await Task.Yield();
+                        return cachedResponse;
+                    }
+                    else
+                    {
+                        throw new HttpRequestExceptionEx(HttpStatusCode.BadGateway, AppResources.No_Internet);
+                    }
                 }
 
+
+                //Check for Etag
                 using (var client = CreateHttpClient(apiPath, authToken))
                 {
                     var content = JsonConvert.SerializeObject(requestModel);
 
-                    using (var requestMessage = GetHttpRequest(apiPath, HttpMethod.Get, content))
+                    using (var requestMessage = GetHttpRequest(apiPath, HttpMethod.Get, content, cachedResponse?.Etag))
                     {
                         var response = await client.SendAsync(requestMessage, cancallationToken).ConfigureAwait(false);
                         await HandleResponse(response);
+
+                        //If there is no change in api response then just return the cached response
+                        if (response.StatusCode == HttpStatusCode.NotModified)
+                        {
+                            _logger.Log($"No new content available returning cahced response : {cachedResponse} ");
+                            return cachedResponse;
+                        }
 
                         string serializedResponse = await response.Content.ReadAsStringAsync();
 
@@ -136,7 +184,13 @@ namespace PhotoWall.Services.APIClient
                             JsonConvert.DeserializeObject<TResponse>(serializedResponse, _serializerSettings));
 
                         //Saves the cache and pass it a timespan for expiration
-                        _localCache.Set(key: apiPath, data: result, tag: null, timeSpan: TimeSpan.FromMilliseconds(CaheExpiration));
+                        // If a ETag is provided with the response, cache it for future requests
+                        if (!string.IsNullOrWhiteSpace(response.Headers.ETag?.Tag))
+                        {
+                            result.Etag = response.Headers.ETag?.Tag;
+                        }
+
+                        CacheManager.Instance().SaveApiResponse<TResponse>(apiPath, result, TimeSpan.FromMilliseconds(CaheExpiration), cacheSecurely);
 
                         return result;
                     }
@@ -155,11 +209,11 @@ namespace PhotoWall.Services.APIClient
 
 
 
-        public async Task<TResponse> PostAsync<TResponse, TRequest>(string apiPath, TRequest requestModel, string authToken = "", bool forceRefresh = true, CancellationToken cancallationToken = default)
+        public async Task<TResponse> PostAsync<TResponse, TRequest>(string apiPath, TRequest requestModel, string authToken = "", bool forceRefresh = true, bool cacheSecurely = false, CancellationToken cancallationToken = default)
         {
             try
             {
-                if (Connectivity.NetworkAccess != NetworkAccess.Internet)
+                if (_connectivity.NetworkAccess != NetworkAccess.Internet)
                 {
                     throw new HttpRequestExceptionEx(HttpStatusCode.BadGateway, "Checkout internet connection");
                 }
@@ -198,9 +252,9 @@ namespace PhotoWall.Services.APIClient
         #endregion
 
         #region Private Methods
-        private HttpClient CreateHttpClient(string url, string token = "")
+        private HttpClient CreateHttpClient(string url, string token)
         {
-            var httpClient = new HttpClient();
+            var httpClient = _httpClientProvider.GetClient();
             httpClient.BaseAddress = new Uri(url);
 
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -215,9 +269,10 @@ namespace PhotoWall.Services.APIClient
             return httpClient;
         }
 
-        private HttpRequestMessage GetHttpRequest(string url, HttpMethod method, string content = null)
+        private HttpRequestMessage GetHttpRequest(string url, HttpMethod method, string content = null, string etag = null)
         {
             HttpRequestMessage message = new HttpRequestMessage(method, url);
+
             foreach (var header in _headers)
             {
                 message.Headers.Add(header.Key, header.Value);
@@ -229,6 +284,13 @@ namespace PhotoWall.Services.APIClient
             {
                 message.Content = new StringContent(content, Encoding.UTF8, "application/json");
             }
+
+            if (!string.IsNullOrWhiteSpace(etag))
+            {
+                message.Headers.IfNoneMatch.Clear();
+                message.Headers.IfNoneMatch.Add(new EntityTagHeaderValue(etag));
+            }
+
             return message;
         }
 

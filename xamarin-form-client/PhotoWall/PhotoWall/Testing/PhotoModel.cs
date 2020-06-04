@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using PhotoWall.Models;
 
 namespace PhotoWall.Testing
 {
@@ -11,7 +12,7 @@ namespace PhotoWall.Testing
         public string postId { get; set; }
     }
 
-    public class PhotoWallPosts
+    public class PhotoWallPosts : BaseModel
     {
         public IList<PhotoModel> Posts { get; set; }
     }

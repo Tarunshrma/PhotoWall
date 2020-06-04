@@ -1,5 +1,5 @@
 ﻿using System;
-namespace PhotoWall.Database.NoSQLCache
+namespace PhotoWall.Database.Cache.Interface
 {
     public interface ILocalCache
     {
