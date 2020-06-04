@@ -4,6 +4,8 @@ using MonkeyCache;
 using MonkeyCache.SQLite;
 using Xamarin.Essentials;
 using PhotoWall.Database.Cache.Interface;
+using Newtonsoft.Json;
+using PhotoWall.Core.Security;
 
 namespace PhotoWall.Database.NoSQLCache
 {
@@ -13,11 +15,14 @@ namespace PhotoWall.Database.NoSQLCache
         private TimeSpan _neverExpireTimeSpan = TimeSpan.FromDays(365 * 100);
         private object _lock = new object();
 
-        public LocalCache()
+        private readonly IEncryptionService _encryptionService;
+
+        public LocalCache(IEncryptionService encryptionService)
         {
             Barrel.ApplicationId = AppInfo.Name;
             var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), AppInfo.Name, "MonkeyCache");
             DBCache = Barrel.Create(path);
+            _encryptionService = encryptionService;
         }
 
         #region Cache Setters
@@ -106,6 +111,54 @@ namespace PhotoWall.Database.NoSQLCache
             }
         }
         #endregion
+
+        public void SaveApiResponse<T>(string key, T data, TimeSpan cacheExpiration, bool encrypted)
+        {
+            try
+            {
+                if (!encrypted)
+                {
+                    Set(key, data, tag: null, cacheExpiration);
+                    return;
+                }
+
+                var serializedData = JsonConvert.SerializeObject(data);
+                var encyptedData = _encryptionService.EncryptString(serializedData);
+                Set(key, encyptedData, tag: null, cacheExpiration);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+        }
+
+        public T GetApiResponse<T>(string key, bool encrypted)
+        {
+            try
+            {
+                if (IsExpired(key: key))
+                {
+                    return default(T);
+                }
+
+                if (!encrypted)
+                {
+                    T cachedResponse = Get<T>(key: key);
+                    return cachedResponse;
+                }
+
+                string cachedEncryptedResponse = Get<string>(key: key);
+                string decryptedResponse = _encryptionService.DecryptString(cachedEncryptedResponse);
+                var deserializedObject = JsonConvert.DeserializeObject<T>(decryptedResponse);
+
+                return deserializedObject;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
 
     }
 

@@ -20,5 +20,9 @@ namespace PhotoWall.Database.Cache.Interface
         void EmptyExpired();
 
         T Get<T>(string key);
+
+        void SaveApiResponse<T>(string key, T data, TimeSpan cacheExpiration, bool encrypted);
+
+        T GetApiResponse<T>(string key, bool encrypted);
     }
 }

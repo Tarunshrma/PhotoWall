@@ -91,7 +91,7 @@ namespace PhotoWall.UnitTesting.Core
             //Arrange
             var apiPath = "testAPI";
             var data = "mockData";
-            CacheManager.Instance().SaveApiResponse<MockResponseModel>(apiPath, new MockResponseModel(data), TimeSpan.FromSeconds(1), false);
+            //CacheManager.Instance().SaveApiResponse<MockResponseModel>(apiPath, new MockResponseModel(data), TimeSpan.FromSeconds(1), false);
             _connectivity.Setup(x => x.NetworkAccess).Returns(NetworkAccess.Unknown);
 
             //Act

@@ -73,7 +73,7 @@ namespace PhotoWall.Services.APIClient
         {
             try
             {
-                TResponse cachedResponse = CacheManager.Instance().GetApiResponse<TResponse>(apiPath, cacheSecurely);
+                TResponse cachedResponse = _localCache.GetApiResponse<TResponse>(apiPath, cacheSecurely);
 
                 //If no internet connection 
                 if (_connectivity.NetworkAccess != NetworkAccess.Internet)
@@ -119,7 +119,7 @@ namespace PhotoWall.Services.APIClient
                         }
 
                         //_localCache.Set(key: apiPath, data: result, tag: null, timeSpan: TimeSpan.FromMilliseconds(CaheExpiration));
-                        CacheManager.Instance().SaveApiResponse<TResponse>(apiPath, result, TimeSpan.FromMilliseconds(CaheExpiration), cacheSecurely);
+                        _localCache.SaveApiResponse<TResponse>(apiPath, result, TimeSpan.FromMilliseconds(CaheExpiration), cacheSecurely);
 
                         return result;
                     }
@@ -141,7 +141,7 @@ namespace PhotoWall.Services.APIClient
         {
             try
             {
-                TResponse cachedResponse = CacheManager.Instance().GetApiResponse<TResponse>(apiPath, cacheSecurely);
+                TResponse cachedResponse = _localCache.GetApiResponse<TResponse>(apiPath, cacheSecurely);
 
                 //If no internet connection 
                 if (_connectivity.NetworkAccess != NetworkAccess.Internet)
@@ -190,7 +190,7 @@ namespace PhotoWall.Services.APIClient
                             result.Etag = response.Headers.ETag?.Tag;
                         }
 
-                        CacheManager.Instance().SaveApiResponse<TResponse>(apiPath, result, TimeSpan.FromMilliseconds(CaheExpiration), cacheSecurely);
+                        _localCache.SaveApiResponse<TResponse>(apiPath, result, TimeSpan.FromMilliseconds(CaheExpiration), cacheSecurely);
 
                         return result;
                     }

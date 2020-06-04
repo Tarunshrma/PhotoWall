@@ -6,10 +6,11 @@ using Prism.Navigation;
 using PhotoWall.Core.Loggers;
 using Xamarin.Essentials;
 using Xamarin.Forms;
+using Prism.AppModel;
 
 namespace PhotoWall.ViewModels
 {
-    public class BaseViewModel : BindableBase, INavigationAware, IDestructible
+    public class BaseViewModel : BindableBase, INavigationAware, IDestructible, IPageLifecycleAware
     {
         protected ILogger Logger { get; private set; }
 
@@ -66,6 +67,16 @@ namespace PhotoWall.ViewModels
         }
 
         virtual public void OnNavigatedTo(INavigationParameters parameters)
+        {
+
+        }
+
+        virtual public void OnAppearing()
+        {
+
+        }
+
+        virtual public void OnDisappearing()
         {
 
         }

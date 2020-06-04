@@ -2,14 +2,40 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="PhotoWall.Views.HomeView"
-             xmlns:resources="clr-namespace:PhotoWall.Resources.Resx">
+             xmlns:resources="clr-namespace:PhotoWall.Resources.Resx"
+             Title="PhotoWall">
     <ContentPage.Content>
-        <StackLayout>
-            <!-- Place new controls here -->
-            <Label Text="{x:Static resources:AppResources.Title}" />
-            <ActivityIndicator Color="Orange" IsRunning="{Binding IsBusy}"/>
-            <Button Command="{Binding FetchPhotosCommand}" Text="Fetch Photos" HorizontalOptions="Center" VerticalOptions="CenterAndExpand"/>
-            <Label Text="Welcome to Xamarin.Forms!" HorizontalOptions="Center" VerticalOptions="CenterAndExpand" />
-        </StackLayout>
+        <RefreshView IsRefreshing="{Binding IsBusy, Mode=OneWay}"
+             Command="{Binding FetchPhotosCommand}">
+            <CollectionView ItemsSource="{Binding Posts.Posts}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Padding="10">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Image Grid.RowSpan="2"
+                       Source="{Binding ImageUrl}"
+                       Aspect="AspectFill"
+                       HeightRequest="60"
+                       WidthRequest="60" />
+                            <Label Grid.Column="1"
+                       Text="{Binding Description}"
+                       FontAttributes="Bold" />
+                            <Label Grid.Row="1"
+                       Grid.Column="1"
+                       Text="{Binding postId}"
+                       FontAttributes="Italic"
+                       VerticalOptions="End" />
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
     </ContentPage.Content>
 </ContentPage>

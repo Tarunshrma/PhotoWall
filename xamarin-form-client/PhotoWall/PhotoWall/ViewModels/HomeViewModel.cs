@@ -12,6 +12,21 @@ namespace PhotoWall.ViewModels
     {
         private readonly IPhotoService _photoService;
 
+
+        private PhotoWallPosts _posts;
+        public PhotoWallPosts Posts
+        {
+            get
+            {
+                return _posts;
+            }
+
+            set
+            {
+                SetProperty(ref _posts, value);
+            }
+        }
+
         public CustomCommand FetchPhotosCommand { get; private set; }
 
         public HomeViewModel(IPhotoService photoService)
@@ -24,9 +39,15 @@ namespace PhotoWall.ViewModels
         private async Task FetchPhotos()
         {
             IsBusy = true;
-            var photos = await _photoService.GetPostsAsync();
-            Debug.Write(photos);
+            Posts = await _photoService.GetPostsAsync();
+            Debug.Write(Posts);
             IsBusy = false;
+        }
+
+        public override void OnAppearing()
+        {
+            base.OnAppearing();
+            FetchPhotosCommand.Execute();
         }
     }
 }
