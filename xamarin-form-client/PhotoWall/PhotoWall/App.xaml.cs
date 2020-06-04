@@ -18,6 +18,9 @@ using PhotoWall.Analytics;
 using Xamarin.Essentials.Interfaces;
 using Xamarin.Essentials.Implementation;
 using Xamarin.Essentials;
+using Microsoft.AppCenter;
+using Microsoft.AppCenter.Crashes;
+using Microsoft.AppCenter.Analytics;
 
 namespace PhotoWall
 {
@@ -29,6 +32,10 @@ namespace PhotoWall
 
         protected override void OnStart()
         {
+            AppCenter.Start("android=3dd0a4e5-e64f-449b-9c77-81d7cd947025;" +
+                  "uwp={Your UWP App secret here};" +
+                  "ios={Your iOS App secret here}",
+                  typeof(Microsoft.AppCenter.Analytics.Analytics), typeof(Crashes));
         }
 
         protected override void OnSleep()
