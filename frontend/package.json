@@ -4,6 +4,7 @@
   "homepage": "https://tarunshrma.github.io/learning-reactjs/",
   "private": true,
   "dependencies": {
+    "auth0-js": "^9.13.2",
     "axios": "^0.19.2",
     "prop-types": "^15.7.2",
     "react": "^16.13.1",
@@ -37,10 +38,11 @@
     ]
   },
   "devDependencies": {
-    "gh-pages": "^2.2.0",
-    "typescript": "^3.9.3",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
-    "@testing-library/user-event": "^7.2.1"
+    "@testing-library/user-event": "^7.2.1",
+    "gh-pages": "^2.2.0",
+    "semantic-ui-react": "^0.88.2",
+    "typescript": "^3.9.3"
   }
 }

@@ -5,6 +5,7 @@ using Prism.Commands;
 using PhotoWall.Core.Loggers;
 using PhotoWall.Testing;
 using PhotoWall.Core.Commands;
+using Microsoft.AppCenter.Crashes;
 
 namespace PhotoWall.ViewModels
 {
@@ -29,15 +30,27 @@ namespace PhotoWall.ViewModels
 
         public CustomCommand FetchPhotosCommand { get; private set; }
 
+        public CustomCommand CrashMeCommand { get; private set; }
+
         public HomeViewModel(IPhotoService photoService)
         {
             _photoService = photoService;
 
             FetchPhotosCommand = new CustomCommand(async () => await FetchPhotos());
+
+            CrashMeCommand = new CustomCommand(() => CrashMe());
+        }
+
+        private void CrashMe()
+        {
+            Crashes.GenerateTestCrash();
         }
 
         private async Task FetchPhotos()
         {
+            Microsoft.AppCenter.Analytics.Analytics.TrackEvent("Refreshing Posts");
+
+
             IsBusy = true;
             Posts = await _photoService.GetPostsAsync();
             Debug.Write(Posts);
@@ -46,6 +59,7 @@ namespace PhotoWall.ViewModels
 
         public override void OnAppearing()
         {
+            Microsoft.AppCenter.Analytics.Analytics.TrackEvent("Screeen Loading");
             base.OnAppearing();
             FetchPhotosCommand.Execute();
         }

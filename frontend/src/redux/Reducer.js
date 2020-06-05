@@ -26,9 +26,22 @@ function comments(state = {}, action){
         default: 
             return state; 
     }
+}
 
-} 
+function authenticated(state = false, action){
+    return state; 
+    // switch(action.type){
+    //     case 'ADD_COMMENT':
+    //         if (!state[action.photoId]) {
+    //             return {...state, [action.photoId]: [action.comment]}
+    //             } else {
+    //             return {...state, [action.photoId]: [...state[action.photoId], action.comment] }
+    //         }
+    //     default: 
+    //         return state; 
+    // }
+}
 
-const rootReducer = combineReducers({posts, comments})
+const rootReducer = combineReducers({posts, comments, authenticated})
 
 export default rootReducer;

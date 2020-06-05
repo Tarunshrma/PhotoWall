@@ -10,8 +10,6 @@ class PhotoWall extends Component{
     async componentDidMount() {
         try {
           var posts = await getAllPosts("")
-          
-
           this.props.fetchPhotos(posts);  
           
         } catch (e) {

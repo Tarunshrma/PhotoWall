@@ -3,7 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="PhotoWall.Views.HomeView"
              xmlns:resources="clr-namespace:PhotoWall.Resources.Resx"
-             Title="PhotoWall">
+             Title="PhotoWall" >
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Crash Me"
+                 Order="Primary"
+                 Priority="0" Command="{Binding CrashMeCommand}"/>
+    </ContentPage.ToolbarItems>
     <ContentPage.Content>
         <RefreshView IsRefreshing="{Binding IsBusy, Mode=OneWay}"
              Command="{Binding FetchPhotosCommand}">

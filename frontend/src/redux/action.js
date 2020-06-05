@@ -26,3 +26,9 @@ export function addComment(comment,photoId){
         photoId
     }
 }
+
+export function login(){
+    return{
+        type: 'LOG_IN'
+    }
+}
