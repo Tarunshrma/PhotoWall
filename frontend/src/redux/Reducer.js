@@ -28,7 +28,7 @@ function comments(state = {}, action){
     }
 }
 
-function authenticated(state = false, action){
+function authenticated(state = true, action){
     return state; 
     // switch(action.type){
     //     case 'ADD_COMMENT':

@@ -5,24 +5,23 @@ import AddPhoto from "./AddPhoto"
 import { Route } from "react-router-dom";
 import "../styles/stylesheet.css"
 import PhotoDetail from "./PhotoDetail"
+
 import Login from './Login'
 
 class Main extends Component{
 
-
   componentDidMount(){
-    console.log(this.props);
+    console.log("Is Logged in", this.props.auth.isAuthenticated());
 }
 
     render(){
-      
-     
-      if (!this.props.authenticated) {
-        return <div> 
+
+      if (!this.props.auth.isAuthenticated()) {
+          return <div> 
             <Header title={'PhotoWall'} />
-            <Login/>
-          </div>
-        }
+            <Login />
+        </div>
+      }
 
       return(
           <div>
@@ -34,7 +33,7 @@ class Main extends Component{
             <Route path= "/AddPhoto" render = {({history}) => (
               <AddPhoto {...this.props} history={history}/>
               )}/>
-              <Route path="/PhotoDetail/:id" render={(params)=>(
+            <Route path="/PhotoDetail/:id" render={(params)=>(
                 <PhotoDetail {...this.props} {...params}/>
               )}/>
           </div>

@@ -7,7 +7,7 @@ class Photo extends Component{
 
     onPostDelete = async (postId) => {
         try {
-            await deletePost("",postId)
+            await deletePost(this.props.auth.getAccessToken(),postId)
             this.props.removePhoto(this.props.index)
             
         } catch (e) {
