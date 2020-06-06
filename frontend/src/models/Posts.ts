@@ -3,3 +3,8 @@ export interface Posts {
     description: string
     ImageUrl?: string
 }
+
+export interface NewPost{
+    newPost: Posts
+    uploadUrl: string
+}

@@ -9,6 +9,8 @@ function posts(state = [], action) {
         case 'ADD_PHOTO':
             return [...state, action.photo]
         case 'FETCH_PHOTOS':
+            state = []
+            //return [...state, action.photos]
             return [...state, ...state.concat(action.photos)]
         default: 
             return state;    
@@ -28,20 +30,6 @@ function comments(state = {}, action){
     }
 }
 
-function authenticated(state = true, action){
-    return state; 
-    // switch(action.type){
-    //     case 'ADD_COMMENT':
-    //         if (!state[action.photoId]) {
-    //             return {...state, [action.photoId]: [action.comment]}
-    //             } else {
-    //             return {...state, [action.photoId]: [...state[action.photoId], action.comment] }
-    //         }
-    //     default: 
-    //         return state; 
-    // }
-}
-
-const rootReducer = combineReducers({posts, comments, authenticated})
+const rootReducer = combineReducers({posts, comments})
 
 export default rootReducer;

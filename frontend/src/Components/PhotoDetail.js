@@ -5,16 +5,23 @@ import PhotoComments from "./PhotoComments"
 class PhotoDetail extends Component{
 
     componentDidMount(){
-        console.log(this.props);
+        console.log("PhotoDetail Props",this.props);
     }
 
     render(){
+
+       
+
         const photos = this.props.posts;
-        const selectedPhotoId = Number(this.props.match.params.id);
-        const photo = photos.find((photo) => photo.id === selectedPhotoId);
+        console.log("All Posts",photos);
+
+        const selectedPhotoId = this.props.match.params.id;
+
+        const photo = photos.find((ph) => ph.postId === selectedPhotoId);
+        console.log("Searched Photo",photo);
 
         const comments = this.props.comments[this.props.match.params.id] || []
-        const index = this.props.posts.findIndex((post) => post.id === selectedPhotoId)
+        const index = this.props.posts.findIndex((post) => post.postId === selectedPhotoId)
         
         return <div className="single-photo">
              <Photo post={photo} {...this.props} index={index}/>

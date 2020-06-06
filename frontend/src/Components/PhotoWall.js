@@ -11,7 +11,6 @@ class PhotoWall extends Component{
         try {
           var posts = await getAllPosts(this.props.auth.getAccessToken())
           this.props.fetchPhotos(posts);  
-          
         } catch (e) {
           alert(`Failed to fetch posts: ${e.message}`)
         }

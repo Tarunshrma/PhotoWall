@@ -11,7 +11,6 @@ import Login from './Login'
 class Main extends Component{
 
   componentDidMount(){
-    console.log("Is Logged in", this.props.auth.isAuthenticated());
 }
 
     render(){
@@ -25,6 +24,7 @@ class Main extends Component{
 
       return(
           <div>
+            <Header title={'PhotoWall'} />
             <Route exact path="/" render={()=> (
               <div>
                   <PhotoWall posts={this.props.posts} {...this.props}/>

@@ -21,6 +21,7 @@ class Photo extends Component{
 
     render(){
         const photo = this.props.post;
+
         return <figure className="figure">
             <Link to={`/PhotoDetail/${photo.postId}`}>
                 <img className="photo" src={photo.ImageUrl} alt={photo.description}></img>
