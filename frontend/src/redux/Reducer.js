@@ -16,15 +16,24 @@ function posts(state = [], action) {
             return state;    
     }
 }
-
-function comments(state = {}, action){
+//
+function comments(state = [], action){
     switch(action.type){
         case 'ADD_COMMENT':
-            if (!state[action.photoId]) {
-                return {...state, [action.photoId]: [action.comment]}
-                } else {
-                return {...state, [action.photoId]: [...state[action.photoId], action.comment] }
-            }
+            console.log("Before local state update",state)
+
+            const a = [...state, action.comment]
+            console.log("after local state update",a)
+            return a
+            // if (!state[action.photoId]) {
+            //     return {...state, [action.photoId]: [action.comment]}
+            //     } else {
+            //     return {...state, [action.photoId]: [...state[action.photoId], action.comment] }
+            // }
+        case 'FETCH_COMMENTS':
+           
+            state = []
+            return [...state, ...state.concat(action.comments)]
         default: 
             return state; 
     }

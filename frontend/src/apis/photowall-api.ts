@@ -1,6 +1,7 @@
 import { apiEndpoint } from '../config/config'
 import { Posts } from '../models/Posts';
 import { NewPost } from '../models/Posts';
+import { Comments } from '../models/Comments';
 import Axios from 'axios'
 
 
@@ -44,4 +45,30 @@ export async function getAllPosts(idToken: string): Promise<Posts[]> {
 
   export async function uploadFile(uploadUrl: string, file: Buffer): Promise<void> {
     await Axios.put(uploadUrl, file)
+  }
+
+  export async function addComment(idToken: string, postId: any ,newComment: any): Promise<Comments> {
+    console.log('Adding new commenet ', newComment)
+  
+    const response = await Axios.post(`${apiEndpoint}/posts/${postId}/comments`,JSON.stringify(newComment), {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${idToken}`
+      },
+    })
+    console.log('Comment added:', response.data.newComment)
+    return response.data.newComment
+  }
+
+  export async function getComments(idToken: string, postId: any ): Promise<Comments[]> {
+    console.log('geettng all comment ')
+  
+    const response = await Axios.get(`${apiEndpoint}/posts/${postId}/comments`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${idToken}`
+      },
+    })
+    console.log('All Comments:', response.data.comments)
+    return response.data.comments
   }

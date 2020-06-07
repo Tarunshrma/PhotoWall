@@ -19,6 +19,13 @@ export function addPhoto(photo){
     }
 }
 
+export function fetchComments(comments){
+    return{
+        type: 'FETCH_COMMENTS',
+        comments
+    }
+}
+
 export function addComment(comment,photoId){
     return{
         type: 'ADD_COMMENT',

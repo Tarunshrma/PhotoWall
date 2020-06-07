@@ -2,21 +2,29 @@ import React,{Component} from "react"
 import "../styles/stylesheet.css"
 import {Link} from "react-router-dom"
 import { deletePost} from '../apis/photowall-api'
+import posts from "../data/Posts"
 
 class Photo extends Component{
 
     onPostDelete = async (postId) => {
         try {
+            console.log("Deleting post with id",postId)
+            
             await deletePost(this.props.auth.getAccessToken(),postId)
+            console.log("Deleted post with id",postId)
+
+            if(this.props.history){
+                this.props.history.push('/');
+            }
+
             this.props.removePhoto(this.props.index)
+            console.log("Updating local state",postId)
             
         } catch (e) {
             alert(`Failed to delete posts: ${e.message}`)
         }
        
-        if(this.props.history){
-            this.props.history.push('/');
-        }
+        
       }
 
     render(){

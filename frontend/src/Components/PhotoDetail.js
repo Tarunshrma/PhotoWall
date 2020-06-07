@@ -1,16 +1,28 @@
 import React, {Component} from "react"
 import Photo from "./Photo"
 import PhotoComments from "./PhotoComments"
+// import { getComments} from '../apis/photowall-api'
 
 class PhotoDetail extends Component{
 
-    componentDidMount(){
+    async componentDidMount() {
+
         console.log("PhotoDetail Props",this.props);
+
+        // try {
+        //   const selectedPhotoId = this.props.match.params.id;
+
+        //   var comments = await getComments(this.props.auth.getAccessToken(),selectedPhotoId)
+
+        //   console.log('Fetched comments ',comments)
+
+        //   this.props.fetchComments(comments);  
+        // } catch (e) {
+        //   alert(`Failed to fetch posts: ${e.message}`)
+        // }
     }
 
     render(){
-
-       
 
         const photos = this.props.posts;
         console.log("All Posts",photos);
@@ -25,7 +37,8 @@ class PhotoDetail extends Component{
         
         return <div className="single-photo">
              <Photo post={photo} {...this.props} index={index}/>
-             <PhotoComments comments={comments} addComment={this.props.addComment} photoId={selectedPhotoId}/>
+             <PhotoComments photoId={selectedPhotoId} auth={this.props.auth} {...this.props}/>
+             {/* <PhotoComments comments={comments} addComment={this.props.addComment} photoId={selectedPhotoId} auth={this.props.auth}/> */}
         </div>
     }
 
