@@ -1,5 +1,6 @@
 export interface Post {
-    postId: string
+    postId: string,
+    userId: string,
     description: string
     ImageUrl?: string
 }

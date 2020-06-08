@@ -4,7 +4,7 @@ import 'source-map-support/register'
 import * as middy from 'middy'
 import { cors } from 'middy/middlewares'
 
-import {DBPostsService} from '../../dataAccess/DBPostsService' 
+import {DBPostsService} from '../../services/dataAccess/DBPostsService' 
 import {ApiResponseHelper} from '../../helpers/ApiResponseHelper'
 
 const dbPostsService = new DBPostsService();

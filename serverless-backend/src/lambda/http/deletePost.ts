@@ -1,41 +1,23 @@
-import { APIGatewayProxyHandler, APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+import {  APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import 'source-map-support/register'
-import * as AWS  from 'aws-sdk'
 
 import * as middy from 'middy'
 import { cors } from 'middy/middlewares'
 
-const docClient = new AWS.DynamoDB.DocumentClient()
+import {DBPostsService} from '../../services/dataAccess/DBPostsService' 
+import {ApiResponseHelper} from '../../helpers/ApiResponseHelper'
 
-const postsTable = process.env.POSTS_TABLE
+const dbPostsService = new DBPostsService();
+const apiResponseHelper = new ApiResponseHelper();
 
 export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     console.log('Processing event: ', event)
     
     const postId = event.pathParameters.postId
     
-    const params = {
-        TableName: postsTable,
-        Key:{
-            "postId":postId
-        }
-    };
+    await dbPostsService.deletePost(postId); 
+    return  apiResponseHelper.generateEmptySuccessResponse(200);
 
-    await docClient.delete(params,(error,_data)=>{
-        if(error){
-            console.log(error.message)
-        }else{
-            console.log("Succesfully deleted post: ",postId)
-        }
-    }).promise();
-
-    return {
-        statusCode: 200,
-        headers:{
-          'Access-Control-Allow-Origin':'*'
-        },
-        body: null
-      }
 })
 
 handler.use(

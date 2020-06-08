@@ -13,6 +13,18 @@ export class ApiResponseHelper{
             })
           }
     }
+
+    generateCustomObjectDataSuccessResponse(statusCode: number, object: any): APIGatewayProxyResult{
+        return {
+            statusCode: statusCode,
+            headers:{
+              'Access-Control-Allow-Origin':'*'
+            },
+            body: JSON.stringify({
+                object
+            })
+          }
+    }
     
     generateEmptySuccessResponse(statusCode: number): APIGatewayProxyResult{
         return {
