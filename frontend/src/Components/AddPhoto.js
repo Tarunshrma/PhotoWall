@@ -31,22 +31,6 @@ class AddPhoto extends Component{
         })
     }
 
-    // handleOnSubmit(event){
-    //     event.preventDefault();
-    //     const url = event.target.elements.url.value;
-    //     const caption = event.target.elements.caption.value;
-
-    //     const post = {
-    //         id: Number(new Date()),
-    //         description: caption,
-    //         imageLink: url
-    //     }
-    //     if (caption && url){
-    //         this.props.addPhoto(post);
-    //         this.props.history.push('/');
-    //     }
-    // }
-
     handleOnSubmit = async (event) => {
         event.preventDefault()
     

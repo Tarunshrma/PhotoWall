@@ -1,30 +1,22 @@
-import { APIGatewayProxyHandler, APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import 'source-map-support/register'
-import * as AWS  from 'aws-sdk'
 
 import * as middy from 'middy'
 import { cors } from 'middy/middlewares'
 
-const docClient = new AWS.DynamoDB.DocumentClient()
+import {DBPostsService} from '../../dataAccess/DBPostsService' 
+import {ApiResponseHelper} from '../../helpers/ApiResponseHelper'
 
-const postsTable = process.env.POSTS_TABLE
+const dbPostsService = new DBPostsService();
+const apiResponseHelper = new ApiResponseHelper();
 
 export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+
   console.log('Processing event: ', event)
 
-  //TODO: Replace it with query as scan is lesss performant
-  const result = await docClient.scan({
-    TableName: postsTable
-  }).promise()
+   const posts = await dbPostsService.getAllPosts();
+   return apiResponseHelper.generateDataSuccessResponse(200,'posts',posts); 
 
-  const posts = result.Items
-
-  return {
-    statusCode: 200,
-    body: JSON.stringify({
-        posts
-    })
-  }
 })
 
 handler.use(
