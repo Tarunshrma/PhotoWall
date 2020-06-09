@@ -21,7 +21,7 @@ export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGat
 
    const result = await dbPostsService.addPost(parsedBody,userId);
 
-   return apiResponseHelper.generateCustomObjectDataSuccessResponse(201,result);
+   return apiResponseHelper.generateDataSuccessResponse(201,"newPost",result);
 })
 
 handler.use(

@@ -40,7 +40,7 @@ export async function getAllPosts(idToken: string): Promise<Posts[]> {
       },
     })
     console.log('Posts added:', response.data)
-    return response.data
+    return response.data.newPost
   }
 
   export async function uploadFile(uploadUrl: string, file: Buffer): Promise<void> {

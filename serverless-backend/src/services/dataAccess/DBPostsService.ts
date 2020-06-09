@@ -60,7 +60,7 @@ export class DBPostsService{
         const postId = uuid.v4();
         const imageId = uuid.v4();
 
-        const uploadUrl = imageStorageService.getPostImageUploadUrl(imageId)
+        const uploadUrl = await imageStorageService.getPostImageUploadUrl(imageId)
      
         const newPost = {
             postId: postId,
@@ -83,7 +83,7 @@ export class DBPostsService{
           }).promise()
 
           const postResponse = {
-                                newPost:newPost,
+                                post:newPost,
                                 uploadUrl:uploadUrl
                                } 
         

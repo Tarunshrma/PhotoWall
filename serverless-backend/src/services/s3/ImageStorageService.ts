@@ -6,7 +6,7 @@ const s3 = new AWS.S3({
 
 const postImageBucketName = process.env.POST_IMAGES_S3_BUCKET
 const postThumbnailImageBucketName = process.env.POST_IMAGES_THUMBNAILS_S3_BUCKET
-const urlExpiration = process.env.SIGNED_URL_EXPIRATION
+const urlExpiration = 300//process.env.SIGNED_URL_EXPIRATION
 
 export class ImageStorageService{
 
