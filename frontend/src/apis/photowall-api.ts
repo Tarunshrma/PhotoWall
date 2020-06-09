@@ -56,8 +56,8 @@ export async function getAllPosts(idToken: string): Promise<Posts[]> {
         'Authorization': `Bearer ${idToken}`
       },
     })
-    console.log('Comment added:', response.data.newComment)
-    return response.data.newComment
+    console.log('Comment added:', response.data)
+    return response.data
   }
 
   export async function getComments(idToken: string, postId: any ): Promise<Comments[]> {

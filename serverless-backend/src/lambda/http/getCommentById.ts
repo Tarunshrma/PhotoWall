@@ -1,48 +1,32 @@
-import { APIGatewayProxyHandler, APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+import {  APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import 'source-map-support/register'
-import * as AWS  from 'aws-sdk'
+import * as middy from 'middy'
+import { cors } from 'middy/middlewares'
 
-const docClient = new AWS.DynamoDB.DocumentClient()
+import {ApiResponseHelper} from '../../helpers/ApiResponseHelper'
+import { DBCommentsService } from '../../services/dataAccess/DBCommentsService';
 
-const commentsTable = process.env.COMMENTS_TABLE
-const commentsIndex = process.env.COMMENTS_INDEX
+const dbCommentsService = new DBCommentsService();
+const apiResponseHelper = new ApiResponseHelper();
 
-export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+
+export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+
+  console.log('Processing event: ', event)
 
   const commentId = event.pathParameters.commentId  
-
-
-  const params = {
-    TableName: commentsTable,
-    IndexName: commentsIndex,
-    KeyConditionExpression: 'commentId = :commentId',
-    ExpressionAttributeValues: {
-      ':commentId': commentId
-    }
-  };
-
-  const result = await docClient.query(params).promise();
+  const result = await dbCommentsService.getCommentsFromId(commentId);
 
   if(result.Count !== 0){
-    return {
-        statusCode: 200,
-        headers: {
-          'Access-Control-Allow-Origin': '*'
-        },
-        body: JSON.stringify(
-            result.Items[0]
-        )
-      }
+    return apiResponseHelper.generateCustomObjectDataSuccessResponse(200,result.Items[0])
   }  
 
-  return {
-    statusCode: 404,
-    headers: {
-      'Access-Control-Allow-Origin': '*'
-    },
-    body: JSON.stringify({
-        'error': 'No comment with this id'
-    })
-  }
-}
+  return apiResponseHelper.generateErrorResponse(404,'No comment with this id')
+})
+
+handler.use(
+  cors({
+    credentials: true
+  })
+)
 

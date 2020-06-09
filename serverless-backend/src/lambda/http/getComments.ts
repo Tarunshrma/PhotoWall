@@ -1,68 +1,36 @@
-import { APIGatewayProxyHandler, APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import 'source-map-support/register'
-import * as AWS  from 'aws-sdk'
-import { Bool } from 'aws-sdk/clients/clouddirectory'
+import * as middy from 'middy'
+import { cors } from 'middy/middlewares'
 
-const docClient = new AWS.DynamoDB.DocumentClient()
+import {DBPostsService} from '../../services/dataAccess/DBPostsService' 
+import {ApiResponseHelper} from '../../helpers/ApiResponseHelper'
+import { DBCommentsService } from '../../services/dataAccess/DBCommentsService';
 
-const postsTable = process.env.POSTS_TABLE
-const commentsTable = process.env.COMMENTS_TABLE
+const dbPostsService = new DBPostsService();
+const dbCommentsService = new DBCommentsService();
+const apiResponseHelper = new ApiResponseHelper();
 
-export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+
+export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+
+  console.log('Processing event: ', event)
 
   const postId = event.pathParameters.postId  
-  const postExist = await isPostExist(postId);
+  const postExist = await dbPostsService.isPostExist(postId);
 
   if(!postExist){
-      return {
-          statusCode: 404,
-          headers: {
-              'Access-Control-Allow-Origin': '*'
-          },
-          body: JSON.stringify({
-              error:"Post not exist"
-          })
-      }
+    apiResponseHelper.generateErrorResponse(404,"Post does not exist")
   }  
 
-  const comments = await getCommentsFromPostId(postId)
+  const comments = await dbCommentsService.getCommentsFromPostId(postId)
 
-  return {
-    statusCode: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*'
-    },
-    body: JSON.stringify({
-        comments
-    })
-  }
-}
+  return apiResponseHelper.generateDataSuccessResponse(200,"comments",comments)
 
-async function getCommentsFromPostId(postId: string) {
+})
 
-    const params = {
-        TableName: commentsTable,
-        KeyConditionExpression: 'postId = :postId',
-        ExpressionAttributeValues: {
-          ':postId': postId
-        }
-      };
-
-    const result = await docClient.query(params).promise();
-
-    return result.Items;
-}
-
-async function isPostExist(postId: string): Promise<Bool>
-{
-    const params = {
-        TableName : postsTable,
-        Key: {
-            postId: postId
-        }
-    };
-
-    const result = await docClient.get(params).promise();
-
-    return !!result.Item; 
-} 
+handler.use(
+  cors({
+    credentials: true
+  })
+)

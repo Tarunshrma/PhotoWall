@@ -5,6 +5,7 @@ import {Post} from '../../models/Post'
 import * as uuid from 'uuid'
 import {getUserIdFromToken} from '../../utils/utils'
 import {ImageStorageService} from '../../services/s3/ImageStorageService' 
+import { Bool } from 'aws-sdk/clients/clouddirectory'
 
 
 const imageStorageService = new ImageStorageService();
@@ -89,7 +90,29 @@ export class DBPostsService{
         
           return postResponse
     }
+
+    async isPostExist(postId: string): Promise<Bool>
+    {
+        const params = {
+            TableName : this.postsTable,
+            Key: {
+                postId: postId
+            }
+        };
+
+        const result = await this.docClient.get(params,(error,_data)=>{
+            if(error){
+                this.logger.error(error.message)
+            }else{
+                this.logger.info("Post exist with id", postId)
+            } 
+        }).promise();
+
+        return !!result.Item; 
+    }
 }
+
+
 
 
  

@@ -20,9 +20,9 @@ export class ApiResponseHelper{
             headers:{
               'Access-Control-Allow-Origin':'*'
             },
-            body: JSON.stringify({
+            body: JSON.stringify(
                 object
-            })
+            )
           }
     }
     
