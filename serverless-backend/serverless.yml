@@ -15,10 +15,12 @@ custom:
 plugins:
   - serverless-webpack
   - serverless-websockets-plugin
+  - serverless-plugin-tracing
 
 provider:
   name: aws
   runtime: nodejs12.x
+  tracing: true 
 
   apiGateway:
     minimumCompressionSize: 1024 # Enable gzip compression for responses > 1 KB
@@ -37,6 +39,14 @@ provider:
   region: ${opt:region,'ap-south-1'}
   
   iamRoleStatements:
+
+    - Effect: "Allow" # xray permissions (required)
+      Action:
+        - "xray:PutTraceSegments"
+        - "xray:PutTelemetryRecords"
+      Resource:
+        - "*"
+
     - Effect: Allow
       Action:
         - dynamodb:Scan
