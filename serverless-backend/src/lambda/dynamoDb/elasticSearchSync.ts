@@ -36,7 +36,7 @@ export const handler: DynamoDBStreamHandler = async (event: DynamoDBStreamEvent)
         description: newItem.description.S
       }
 
-      console.log('Body to bee inserteed in ESs', JSON.stringify(body))
+      console.log('Body to bee inserted in ESs', JSON.stringify(body))
   
       await es.index({
         index: 'post-index',

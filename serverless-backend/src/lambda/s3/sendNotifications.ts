@@ -1,10 +1,12 @@
 import { SNSHandler, SNSEvent, S3Event } from 'aws-lambda'
 import 'source-map-support/register'
 import * as AWS  from 'aws-sdk'
+import {createLogger} from '../../utils/logger'
 
-const docClient = new AWS.DynamoDB.DocumentClient()
+import {DBWSConnectionService} from '../../services/dataAccess/DBWSConnectionService' 
 
-const connectionsTable = process.env.CONNECTION_TABLE
+const dbWSConnectionService = new DBWSConnectionService();
+const logger = createLogger('sendNotifications')
 
 const stage = process.env.STAGE
 const apiId = process.env.API_ID
@@ -21,7 +23,7 @@ export const handler: SNSHandler = async (event: SNSEvent) => {
     for(const snsRecord of event.Records)
     {
         const s3EventStr = snsRecord.Sns.Message
-        console.log('Processing S3 event', s3EventStr)
+        logger.log('Processing S3 event', s3EventStr)
         const s3Event = JSON.parse(s3EventStr)
 
         await processS3Event(s3Event)
@@ -31,11 +33,9 @@ export const handler: SNSHandler = async (event: SNSEvent) => {
   async function processS3Event(s3Event: S3Event) {
     for (const record of s3Event.Records) {
       const key = record.s3.object.key
-      console.log('Processing S3 item with key: ', key)
+      logger.log('Processing S3 item with key: ', key)
   
-      const connections = await docClient.scan({
-          TableName: connectionsTable
-      }).promise()
+      const connections = await dbWSConnectionService.getAllConnections();
   
       const payload = {
           imageId: key
@@ -50,7 +50,7 @@ export const handler: SNSHandler = async (event: SNSEvent) => {
 
   async function sendMessageToClient(connectionId, payload) {
     try {
-      console.log('Sending message to a connection', connectionId)
+      logger.log('Sending message to a connection', connectionId)
   
       await apiGateway.postToConnection({
         ConnectionId: connectionId,
@@ -58,17 +58,11 @@ export const handler: SNSHandler = async (event: SNSEvent) => {
       }).promise()
   
     } catch (e) {
-      console.log('Failed to send message', JSON.stringify(e))
+      logger.log('Failed to send message', JSON.stringify(e))
       if (e.statusCode === 410) {
-        console.log('Stale connection')
-  
-        await docClient.delete({
-          TableName: connectionsTable,
-          Key: {
-            id: connectionId
-          }
-        }).promise()
-  
+        logger.warning('Stale connection')
+        
+        await dbWSConnectionService.deleteConnection(connectionId);
       }
     }
   }

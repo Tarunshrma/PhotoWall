@@ -1,15 +1,13 @@
 import { SNSEvent, SNSHandler, S3EventRecord } from 'aws-lambda'
 import 'source-map-support/register'
-import * as AWS from 'aws-sdk'
-import Jimp from 'jimp/es'
+import {ImageStorageService} from '../../services/s3/ImageStorageService' 
+import {createLogger} from '../../utils/logger'
 
-const s3 = new AWS.S3()
-
-const imagesBucketName = process.env.POST_IMAGES_S3_BUCKET
-const thumbnailBucketName = process.env.POST_IMAGES_THUMBNAILS_S3_BUCKET
+const imageStorageService = new ImageStorageService();
+const logger = createLogger('resizeImage')
 
 export const handler: SNSHandler = async (event: SNSEvent) => {
-  console.log('Processing SNS event ', JSON.stringify(event))
+  logger.log('Processing SNS event ', JSON.stringify(event))
   for (const snsRecord of event.Records) {
     const s3EventStr = snsRecord.Sns.Message
     console.log('Processing S3 event', s3EventStr)
@@ -23,27 +21,6 @@ export const handler: SNSHandler = async (event: SNSEvent) => {
 
 async function processImage(record: S3EventRecord) {
   const key = record.s3.object.key
-  console.log('Processing S3 item with key: ', key)
-  const response = await s3
-    .getObject({
-      Bucket: imagesBucketName,
-      Key: key
-    })
-    .promise()
-
-  const body = response.Body
-  const image = await Jimp.read(body)
-
-  console.log('Resizing image')
-  image.resize(150, Jimp.AUTO)
-  const convertedBuffer = await image.getBufferAsync(Jimp.AUTO)
-
-  console.log(`Writing image back to S3 bucket: ${thumbnailBucketName}`)
-  await s3
-    .putObject({
-      Bucket: thumbnailBucketName,
-      Key: `${key}.jpeg`,
-      Body: convertedBuffer
-    })
-    .promise()
+  logger.log('Processing S3 item with key: ', key)
+  imageStorageService.resizeAndUploadImage(key);
 }
