@@ -99,6 +99,7 @@ functions:
           method: get
           path: posts
           cors: true
+          authorizer: Auth
 
   DeletePosts:
     handler: src/lambda/http/deletePost.handler
@@ -107,6 +108,7 @@ functions:
           method: delete
           path: posts/{postId}
           cors: true
+          authorizer: Auth
     # iamRoleStatements:
     #   - Effect: Allow
     #     Action:
@@ -121,6 +123,7 @@ functions:
           method: post
           path: posts
           cors: true
+          authorizer: Auth
           # authorizer: Auth
           request:
             # Schema that will be used to validate incoming requests
@@ -134,6 +137,7 @@ functions:
           method: get
           path: posts/{postId}/comments
           cors: true
+          authorizer: Auth
 
   AddComments:
     handler: src/lambda/http/addComment.handler
@@ -141,7 +145,8 @@ functions:
       - http:
           method: post
           path: posts/{postId}/comments
-          cors: true  
+          cors: true
+          authorizer: Auth  
           request:
             # Schema that will be used to validate incoming requests
             schema:
@@ -154,6 +159,7 @@ functions:
           method: get
           path: comments/{commentId}
           cors: true
+          authorizer: Auth
 
   SendNotifications:
     environment:

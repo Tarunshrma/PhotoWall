@@ -10,7 +10,7 @@ class Photo extends Component{
         try {
             console.log("Deleting post with id",postId)
             
-            await deletePost(this.props.auth.getAccessToken(),postId)
+            await deletePost(this.props.auth.getIdToken(),postId)
             console.log("Deleted post with id",postId)
 
             if(this.props.history){

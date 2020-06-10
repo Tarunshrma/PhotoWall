@@ -3,6 +3,11 @@ import 'source-map-support/register'
 import { verify } from 'jsonwebtoken'
 import { JwtToken } from '../../auth/JwtToken'
 
+import {createLogger} from '../../utils/logger'
+
+const logger = createLogger('AuthService')
+
+
 const RS256_Certificate = `-----BEGIN CERTIFICATE-----
 MIIDBzCCAe+gAwIBAgIJNju3A8NGbdvAMA0GCSqGSIb3DQEBCwUAMCExHzAdBgNV
 BAMTFmRldi1qOG9teXMtdC5hdXRoMC5jb20wHhcNMjAwNDI4MDM0MTA1WhcNMzQw
@@ -27,7 +32,7 @@ export const handler: CustomAuthorizerHandler = async (event: CustomAuthorizerEv
 
     try{
         var token = verifyToken(event.authorizationToken)
-        console.log('User is authorized')
+        logger.info('User is authorized')
 
         return {
             principalId: token.sub,
@@ -43,7 +48,7 @@ export const handler: CustomAuthorizerHandler = async (event: CustomAuthorizerEv
             }
           }
         } catch (e) {
-          console.log('User was not authorized', e.message)
+          logger.error('User was not authorized', e.message)
       
           return {
             principalId: 'user',

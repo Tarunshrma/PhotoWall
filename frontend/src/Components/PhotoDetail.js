@@ -8,19 +8,7 @@ class PhotoDetail extends Component{
     async componentDidMount() {
 
         console.log("PhotoDetail Props",this.props);
-
-        // try {
-        //   const selectedPhotoId = this.props.match.params.id;
-
-        //   var comments = await getComments(this.props.auth.getAccessToken(),selectedPhotoId)
-
-        //   console.log('Fetched comments ',comments)
-
-        //   this.props.fetchComments(comments);  
-        // } catch (e) {
-        //   alert(`Failed to fetch posts: ${e.message}`)
-        // }
-    }
+   }
 
     render(){
 

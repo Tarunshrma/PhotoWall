@@ -13,7 +13,7 @@ class  PhotoComments extends Component{
         const photoId = this.props.photoId;
         if(newComment !== ''){
             event.target.elements.comment.value = "";
-            const comment  =  await addComment(this.props.auth.getAccessToken(),photoId,{comment:newComment}) 
+            const comment  =  await addComment(this.props.auth.getIdToken(),photoId,{comment:newComment}) 
             
             console.log("Add comments at backend",comment);
             this.props.addComment(comment,photoId);
@@ -27,7 +27,7 @@ class  PhotoComments extends Component{
         try {
           const selectedPhotoId = this.props.photoId;//this.props.match.params.id;
 
-          var comments = await getComments(this.props.auth.getAccessToken(),selectedPhotoId)
+          var comments = await getComments(this.props.auth.getIdToken(),selectedPhotoId)
 
           console.log('Fetched comments ',comments)
 
