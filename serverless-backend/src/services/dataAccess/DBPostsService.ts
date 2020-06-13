@@ -6,7 +6,9 @@ import * as uuid from 'uuid'
 import {getUserIdFromToken} from '../../utils/utils'
 import {ImageStorageService} from '../../services/s3/ImageStorageService' 
 import { Bool } from 'aws-sdk/clients/clouddirectory'
+import { DBCommentsService } from '../../services/dataAccess/DBCommentsService';
 
+const dbCommentsService = new DBCommentsService();
 
 const imageStorageService = new ImageStorageService();
 
@@ -64,8 +66,11 @@ export class DBPostsService{
                 console.log(error.message)
             }else{
                 console.log("Succesfully deleted post: ",postId)
+                
             }
         }).promise();
+
+        //await dbCommentsService.deleteAllCommentForPost(postId);
     }
 
     async addPost(post: any, userId: string): Promise<any>{

@@ -67,6 +67,7 @@ provider:
       Action:
         - dynamodb:Query
         - dynamodb:PutItem
+        - dynamodb:DeleteItem
       Resource:
         - "Fn::GetAtt": [CommentsTable, Arn]
 

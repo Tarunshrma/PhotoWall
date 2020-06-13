@@ -62,6 +62,26 @@ export class DBCommentsService{
         return newComment;
     }
 
+    async deleteAllCommentForPost(postId: string): Promise<void>{
+        
+        this.logger.info("Deleting comment from post id:",postId);
+
+        const params = {
+            TableName: this.commentsTable,
+            Key:{
+                "postId":postId
+            }
+        };
+    
+        await this.docClient.delete(params,(error,_data)=>{
+            if(error){
+                console.log(error.message)
+            }else{
+                console.log("Succesfully deleted post: ",postId)
+            }
+        }).promise();
+    }
+
     async getCommentsFromId(commentId: string) {
         
         const params = {
