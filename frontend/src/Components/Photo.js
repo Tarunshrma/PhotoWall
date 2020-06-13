@@ -3,6 +3,7 @@ import "../styles/stylesheet.css"
 import {Link} from "react-router-dom"
 import { deletePost} from '../apis/photowall-api'
 import posts from "../data/Posts"
+import { Visibility } from "semantic-ui-react"
 
 class Photo extends Component{
 
@@ -29,16 +30,22 @@ class Photo extends Component{
 
     render(){
         const photo = this.props.post;
+        const currentUser = false;//this.props.auth.isCurrentUser(photo.userId)
 
         return <figure className="figure">
             <Link to={`/PhotoDetail/${photo.postId}`}>
                 <img className="photo" src={photo.ImageUrl} alt={photo.description}></img>
             </Link>
             <figcaption><p>{photo.description}</p></figcaption>
+
             <div className="button-container">
+                
                 <button className="button" onClick={()=>{
                         this.onPostDelete(photo.postId)
-                    }}>Remove</button>
+                    } } Visibility={currentUser}>
+                    Remove
+                </button>
+
             <Link className="button" to={`/PhotoDetail/${photo.postId}`}> 
                 <div className="comment-count"> 
                 <div className="speech-bubble"> </div>

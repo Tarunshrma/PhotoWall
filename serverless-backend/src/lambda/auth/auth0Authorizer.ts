@@ -1,37 +1,21 @@
 import { CustomAuthorizerHandler, CustomAuthorizerEvent, CustomAuthorizerResult } from 'aws-lambda'
 import 'source-map-support/register'
-import { verify } from 'jsonwebtoken'
+import { verify, decode } from 'jsonwebtoken'
 import { JwtToken } from '../../auth/JwtToken'
+import { Jwt } from '../../auth/Jwt'
+import Axios from 'axios'
 
 import {createLogger} from '../../utils/logger'
 
 const logger = createLogger('AuthService')
 
 
-const RS256_Certificate = `-----BEGIN CERTIFICATE-----
-MIIDBzCCAe+gAwIBAgIJNju3A8NGbdvAMA0GCSqGSIb3DQEBCwUAMCExHzAdBgNV
-BAMTFmRldi1qOG9teXMtdC5hdXRoMC5jb20wHhcNMjAwNDI4MDM0MTA1WhcNMzQw
-MTA1MDM0MTA1WjAhMR8wHQYDVQQDExZkZXYtajhvbXlzLXQuYXV0aDAuY29tMIIB
-IjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzbuB0twoXuXh2owF9mQUBavx
-lmn8aETCRuwdbXUYRtwiGG1+eR3DmkFXoc883GtybF4mvcjfqS7g7biSanhFaEEB
-BySgNKhipuGN9uTg5u65KJ2wMte1wKviifAShPU8+sb/HtHWj2vneq8ZvUdX30j7
-N0VBjbiI7TexmQcJ8VpFLteViH89o+6wjJhHZEtpOEAd2rNGZ5l1/WFYtI3CUAvs
-jA/Jdl61qL3prew2FraGe33BC/qpTzQpW4XncfD6sNEBqIVTHDDbhbU+JIsgPxQW
-LfNK/lAWgpxpRD2nGNEmasT41BJhEKOChXlc6xsZPjTZEkHVI5G7vDKvB6MGowID
-AQABo0IwQDAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBTtGMIohLG+MurBKxfH
-MbTpCHVN0DAOBgNVHQ8BAf8EBAMCAoQwDQYJKoZIhvcNAQELBQADggEBAA8WcNUq
-2riJO2pkOLZdhvMRyyTFlA2lH+hN+rDAuE51dBj55jGh78gstkL3Sn9Dr/SbUWzD
-1ceFGxCPbTozU4PfAkgwm8qzCbmiISGJDE+pzckhCqHS2rFhh08sZ9Vx2MyZUMoC
-GSkVNvEZxua4iyI0+TTknWwTfgQYApUDS4eEgbrBNxlEXikkK4cHYFYVEfzFAo1X
-tpPY1RjiSLbmVQ1aH0QXwWUeeZxxfZwOq7aSTBI70eS8rmIUkYX6KJrziCv+PYWb
-NM64FA9m/8x427g10HMDTl7LKi1BtF+rMLCDfDQhyVh3lKyF/F7MwYkDr+PBHn7e
-1p/6uQQ351MiTR8=
------END CERTIFICATE-----`
+const jwksUrl = 'https://dev-j8omys-t.auth0.com/pem'
 
 export const handler: CustomAuthorizerHandler = async (event: CustomAuthorizerEvent): Promise<CustomAuthorizerResult> => {
 
     try{
-        var token = verifyToken(event.authorizationToken)
+        var token = await verifyToken(event.authorizationToken)
         logger.info('User is authorized')
 
         return {
@@ -66,15 +50,33 @@ export const handler: CustomAuthorizerHandler = async (event: CustomAuthorizerEv
         }
 }
 
-function verifyToken(authToken: String): JwtToken{
-    if(!authToken)
-        throw new Error('No authorization header')
+async function verifyToken(authHeader: string): Promise<JwtToken> {
+  const token = getToken(authHeader)
+  const jwt: Jwt = decode(token, { complete: true }) as Jwt
 
-    if(!authToken.toLowerCase().startsWith('bearer'))  
-        throw new Error('Invalid authorization header') 
+  if(!jwt){
+    throw new Error('invalid token')
+  }
 
-    const token = authToken.split(' ')[1]
+  try {
+    const response = await Axios.get(jwksUrl);
+    var verifedToken = verify(token,response.data,{algorithms:['RS256']})
 
-    return verify(token, RS256_Certificate,{algorithms : ['RS256']}) as JwtToken
-    //Else request succeed
+    return  verifedToken as JwtToken
+  } catch (error) {
+    logger.error(error);
+    return undefined
+  }
+}
+
+function getToken(authHeader: string): string {
+  if (!authHeader) throw new Error('No authentication header')
+
+  if (!authHeader.toLowerCase().startsWith('bearer '))
+    throw new Error('Invalid authentication header')
+
+  const split = authHeader.split(' ')
+  const token = split[1]
+
+  return token
 }

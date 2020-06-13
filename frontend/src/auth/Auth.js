@@ -1,5 +1,6 @@
 import auth0 from 'auth0-js';
 import { authConfig } from '../config/config'
+import { decode } from 'jsonwebtoken'
 
 export default class Auth {
   accessToken;
@@ -50,6 +51,11 @@ export default class Auth {
 
   getIdToken() {
     return this.idToken;
+  }
+
+  isCurrentUser(userId) {
+    const decodedJwt = decode(this.idToken)
+    return  decodedJwt.sub === userId
   }
 
   setSession(authResult) {
