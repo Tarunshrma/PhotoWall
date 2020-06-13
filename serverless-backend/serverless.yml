@@ -16,6 +16,7 @@ plugins:
   - serverless-webpack
   - serverless-websockets-plugin
   - serverless-plugin-tracing
+  - serverless-iam-roles-per-function
 
 provider:
   name: aws
@@ -24,6 +25,7 @@ provider:
 
   apiGateway:
     minimumCompressionSize: 1024 # Enable gzip compression for responses > 1 KB
+    
 
   environment:
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
@@ -47,54 +49,6 @@ provider:
         - "xray:PutTelemetryRecords"
       Resource:
         - "*"
-
-    - Effect: Allow
-      Action:
-        - dynamodb:Query
-        - dynamodb:PutItem
-        - dynamodb:GetItem
-        - dynamodb:DeleteItem
-      Resource:
-        - "Fn::GetAtt": [ PostsTable, Arn ]
-
-    - Effect: Allow
-      Action:
-        - dynamodb:Query
-      Resource:
-        - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.POSTS_TABLE}/index/${self:provider.environment.POST_INDEX_NAME}
-      
-    - Effect: Allow
-      Action:
-        - dynamodb:Query
-        - dynamodb:PutItem
-        - dynamodb:DeleteItem
-      Resource:
-        - "Fn::GetAtt": [CommentsTable, Arn]
-
-    - Effect: Allow
-      Action:
-        - dynamodb:Query
-      Resource:
-        - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.COMMENTS_TABLE}/index/${self:provider.environment.COMMENTS_INDEX}
-
-    - Effect: Allow
-      Action:
-        - s3:PutObject
-        - s3:GetObject
-      Resource: arn:aws:s3:::${self:provider.environment.POST_IMAGES_S3_BUCKET}/*
-
-    - Effect: Allow
-      Action:
-        - s3:PutObject
-      Resource: "arn:aws:s3:::${self:provider.environment.POST_IMAGES_THUMBNAILS_S3_BUCKET}/*"
-
-    - Effect: Allow
-      Action:
-        - dynamodb:Scan
-        - dynamodb:PutItem
-        - dynamodb:DeleteItem
-      Resource:
-        - "Fn::GetAtt": [ WebSocketConnectionsDynamoDBTable, Arn ]
     
 functions:
   Auth:
@@ -108,6 +62,18 @@ functions:
           path: posts
           cors: true
           authorizer: Auth
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.POSTS_TABLE}
+
+      - Effect: Allow
+        Action:
+        - dynamodb:Query
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.POSTS_TABLE}/index/${self:provider.environment.POST_INDEX_NAME}
+
 
   DeletePosts:
     handler: src/lambda/http/deletePost.handler
@@ -117,11 +83,12 @@ functions:
           path: posts/{postId}
           cors: true
           authorizer: Auth
-    # iamRoleStatements:
-    #   - Effect: Allow
-    #     Action:
-    #     - dynamodb:DeleteItem
-    #     Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.POSTS_TABLE}
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+        - dynamodb:DeleteItem
+        Resource:
+          - "Fn::GetAtt": [ PostsTable, Arn ]
 
 
   AddPost:
@@ -132,11 +99,25 @@ functions:
           path: posts
           cors: true
           authorizer: Auth
-          # authorizer: Auth
           request:
             # Schema that will be used to validate incoming requests
             schema:
               application/json: ${file(models/add-post-model.json)}
+              
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+        - dynamodb:PutItem
+        Resource:
+          - "Fn::GetAtt": [ PostsTable, Arn ]
+
+      - Effect: Allow
+        Action:
+          - s3:PutObject
+          - s3:GetObject
+        Resource: arn:aws:s3:::${self:provider.environment.POST_IMAGES_S3_BUCKET}/*
+
+
 
   GetComments:
     handler: src/lambda/http/getComments.handler
@@ -146,6 +127,25 @@ functions:
           path: posts/{postId}/comments
           cors: true
           authorizer: Auth
+    
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.COMMENTS_TABLE}
+
+      - Effect: Allow
+        Action:
+        - dynamodb:Query
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.COMMENTS_TABLE}/index/${self:provider.environment.COMMENTS_INDEX}
+      
+      - Effect: Allow
+        Action:
+        - dynamodb:GetItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.POSTS_TABLE}
+
 
   AddComments:
     handler: src/lambda/http/addComment.handler
@@ -159,6 +159,19 @@ functions:
             # Schema that will be used to validate incoming requests
             schema:
               application/json: ${file(models/add-comment-model.json)}
+    
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+        - dynamodb:PutItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.COMMENTS_TABLE}
+
+      - Effect: Allow
+        Action:
+        - dynamodb:GetItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.POSTS_TABLE}
+  
+          
 
   GetCommentsById:
     handler: src/lambda/http/getCommentById.handler
@@ -168,6 +181,19 @@ functions:
           path: comments/{commentId}
           cors: true
           authorizer: Auth
+    
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+        - dynamodb:Query
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.COMMENTS_TABLE}
+
+      - Effect: Allow
+        Action:
+        - dynamodb:Query
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.COMMENTS_TABLE}/index/${self:provider.environment.COMMENTS_INDEX}
+
+      
 
   SendNotifications:
     environment:
@@ -186,6 +212,12 @@ functions:
                 - ${self:custom.topicName}
           topicName: ${self:custom.topicName}
 
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+        - dynamodb:Scan
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.CONNECTION_TABLE}
+
   ResizeImage:
     handler: src/lambda/s3/resizeImage.handler
     events:
@@ -199,17 +231,38 @@ functions:
                 - ${self:custom.topicName}
           topicName: ${self:custom.topicName}
 
+    iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - s3:PutObject
+      Resource: "arn:aws:s3:::${self:provider.environment.POST_IMAGES_THUMBNAILS_S3_BUCKET}/*"
+
+
   ConnectHandler:
     handler: src/lambda/websocket/connect.handler
     events:
       - websocket:
           route: $connect
 
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+        - dynamodb:PutItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.CONNECTION_TABLE}
+
+
   DisconnectHandler:
     handler: src/lambda/websocket/disconnect.handler
     events:
       - websocket:
           route: $disconnect
+
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+        - dynamodb:DeleteItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.CONNECTION_TABLE}
+
 
   SyncWithElasticSearch:
     handler: src/lambda/dynamoDb/elasticSearchSync.handler

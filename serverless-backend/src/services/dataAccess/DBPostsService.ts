@@ -6,9 +6,9 @@ import * as uuid from 'uuid'
 import {getUserIdFromToken} from '../../utils/utils'
 import {ImageStorageService} from '../../services/s3/ImageStorageService' 
 import { Bool } from 'aws-sdk/clients/clouddirectory'
-import { DBCommentsService } from '../../services/dataAccess/DBCommentsService';
+//import { DBCommentsService } from '../../services/dataAccess/DBCommentsService';
 
-const dbCommentsService = new DBCommentsService();
+//const dbCommentsService = new DBCommentsService();
 
 const imageStorageService = new ImageStorageService();
 
@@ -70,6 +70,7 @@ export class DBPostsService{
             }
         }).promise();
 
+        //TODO: This is not working; need to be fixed
         //await dbCommentsService.deleteAllCommentForPost(postId);
     }
 
