@@ -9,6 +9,16 @@
 		{
 			"name": "GetPosts",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{AuthToken}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"body": {
@@ -44,11 +54,16 @@
 						"name": "Content-Type",
 						"value": "application/json",
 						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{AuthToken}}",
+						"type": "text"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"description\": \"Pikachu\",\n  \"imageLink\": \"https://pm1.narvii.com/6014/efd2d51a3fc930666b2dd5795779c868e1afbd61_00.jpg\"\n}"
+					"raw": "{\n  \"description\":\"Testing authorization\"\n}"
 				},
 				"url": {
 					"raw": "https://{{appId}}.execute-api.ap-south-1.amazonaws.com/{{stage}}/posts",
@@ -66,6 +81,171 @@
 					]
 				},
 				"description": "Add new post with image link and description"
+			},
+			"response": []
+		},
+		{
+			"name": "GetComments",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{AuthToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://{{appId}}.execute-api.ap-south-1.amazonaws.com/{{stage}}/posts/7e2adb54-e70b-4600-8fd5-e67ec9250bd4/comments",
+					"protocol": "https",
+					"host": [
+						"{{appId}}",
+						"execute-api",
+						"ap-south-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"{{stage}}",
+						"posts",
+						"7e2adb54-e70b-4600-8fd5-e67ec9250bd4",
+						"comments"
+					]
+				},
+				"description": "Get comments on posts"
+			},
+			"response": []
+		},
+		{
+			"name": "GetCommentsById",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{AuthToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://{{appId}}.execute-api.ap-south-1.amazonaws.com/{{stage}}/comments/a9ba3840-7ede-423b-a6ec-8e0ed226edc7",
+					"protocol": "https",
+					"host": [
+						"{{appId}}",
+						"execute-api",
+						"ap-south-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"{{stage}}",
+						"comments",
+						"a9ba3840-7ede-423b-a6ec-8e0ed226edc7"
+					]
+				},
+				"description": "get comments by Id"
+			},
+			"response": []
+		},
+		{
+			"name": "AddComment",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{AuthToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"comment\":\"New Comment \"\n}"
+				},
+				"url": {
+					"raw": "https://{{appId}}.execute-api.ap-south-1.amazonaws.com/{{stage}}/posts/7e2adb54-e70b-4600-8fd5-e67ec9250bd4/comments",
+					"protocol": "https",
+					"host": [
+						"{{appId}}",
+						"execute-api",
+						"ap-south-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"{{stage}}",
+						"posts",
+						"7e2adb54-e70b-4600-8fd5-e67ec9250bd4",
+						"comments"
+					]
+				},
+				"description": "Add comment on a post"
+			},
+			"response": []
+		},
+		{
+			"name": "DeletePost",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{AuthToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://{{appId}}.execute-api.ap-south-1.amazonaws.com/{{stage}}/posts/1f4b8ed7-f947-4e1f-9956-89d65d71bc1c",
+					"protocol": "https",
+					"host": [
+						"{{appId}}",
+						"execute-api",
+						"ap-south-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"{{stage}}",
+						"posts",
+						"1f4b8ed7-f947-4e1f-9956-89d65d71bc1c"
+					]
+				},
+				"description": "Removing a posst"
 			},
 			"response": []
 		}
@@ -94,15 +274,27 @@
 	],
 	"variable": [
 		{
-			"id": "fdc4a025-650f-4a0d-be1b-8087b8634377",
+			"id": "8c688164-e309-4506-8373-48ee238ab37e",
 			"key": "appId",
 			"value": "pq1txc8ozd",
 			"type": "string"
 		},
 		{
-			"id": "166057f7-da04-4d5c-b59c-777ab968ba5a",
+			"id": "d1aa8716-4b3e-49f3-a63d-a3721e62f3a9",
 			"key": "stage",
 			"value": "dev",
+			"type": "string"
+		},
+		{
+			"id": "c282f798-4af9-4781-91a8-b77c9da55d66",
+			"key": "AuthToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "b911c3b5-dce8-4fbb-91d4-dd3cc0a9bf07",
+			"key": "postId",
+			"value": "",
 			"type": "string"
 		}
 	]
