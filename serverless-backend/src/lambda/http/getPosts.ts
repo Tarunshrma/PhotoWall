@@ -7,14 +7,28 @@ import { cors } from 'middy/middlewares'
 import {DBPostsService} from '../../services/dataAccess/DBPostsService' 
 import {ApiResponseHelper} from '../../helpers/ApiResponseHelper'
 
+import {AuthHelper} from '../../helpers/AuthHelper'
+import {createLogger} from '../../utils/logger'
+
+
+const logger = createLogger('GetPostHandler')
+
+
 const dbPostsService = new DBPostsService();
 const apiResponseHelper = new ApiResponseHelper();
+const authHelper = new AuthHelper();
+
 
 export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
 
-  console.log('Processing event: ', event)
+  logger.info('Processing event: ', event)
 
-   const posts = await dbPostsService.getAllPosts();
+  const authHeader = event.headers['Authorization']
+  const userId = authHelper.getUserIdFromAathrizationHeader(authHeader)
+
+  logger.info('Get all posts for user',userId)
+
+   const posts = await dbPostsService.getAllPosts(userId);
    return apiResponseHelper.generateDataSuccessResponse(200,'posts',posts); 
 
 })

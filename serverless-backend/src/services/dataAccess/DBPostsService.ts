@@ -18,22 +18,34 @@ export class DBPostsService{
     constructor(        
         private readonly docClient: AWS.DynamoDB.DocumentClient = new XAWS.DynamoDB.DocumentClient(),
         private readonly postsTable = process.env.POSTS_TABLE,
+        private readonly postIndex = process.env.POST_INDEX_NAME,
         private readonly logger = createLogger('DBPostsService')
     )
     {}
 
-    async getAllPosts(): Promise<Post[]>{
+    async getAllPosts(userId: string): Promise<Post[]>{
 
         this.logger.info("Fetching all posts:");
 
-        //TODO: Replace it with query as scan is lesss performant
-        const result = await this.docClient.scan({
-            TableName: this.postsTable
+        const params = {
+            TableName: this.postsTable,
+            IndexName: this.postIndex,
+            KeyConditionExpression: 'userId = :userId',
+            ExpressionAttributeValues: {
+              ':userId': userId
+            }
+          };
+
+        const result = await this.docClient.query(params,(error,_data)=>{
+            if(error){
+                console.log(error.message)
+            }else{
+                console.log("Succesfully fetched post for user : ",userId)
+            }
         }).promise()
 
         const posts = result.Items as Post[];
         return posts; 
-    
     }
 
     async deletePost(postId: string): Promise<void>{

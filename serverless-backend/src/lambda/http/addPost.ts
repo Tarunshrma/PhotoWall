@@ -1,12 +1,14 @@
 import {  APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import 'source-map-support/register'
-import {createLogger} from '../../utils/logger'
 import * as middy from 'middy'
 import { cors } from 'middy/middlewares'
 
 import {DBPostsService} from '../../services/dataAccess/DBPostsService' 
 import {ApiResponseHelper} from '../../helpers/ApiResponseHelper'
+
+
 import {AuthHelper} from '../../helpers/AuthHelper'
+import {createLogger} from '../../utils/logger'
 
 
 const dbPostsService = new DBPostsService();

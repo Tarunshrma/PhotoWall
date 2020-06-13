@@ -28,6 +28,7 @@ provider:
   environment:
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
     POSTS_TABLE: tblPosts-${self:provider.stage}
+    POST_INDEX_NAME: PostIndex
     COMMENTS_TABLE: tblComments-${self:provider.stage}
     CONNECTION_TABLE: tblConnections-${self:provider.stage}
     COMMENTS_INDEX: CommentIdIndex
@@ -49,13 +50,19 @@ provider:
 
     - Effect: Allow
       Action:
-        - dynamodb:Scan
+        - dynamodb:Query
         - dynamodb:PutItem
         - dynamodb:GetItem
         - dynamodb:DeleteItem
       Resource:
         - "Fn::GetAtt": [ PostsTable, Arn ]
-    
+
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+      Resource:
+        - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.POSTS_TABLE}/index/${self:provider.environment.POST_INDEX_NAME}
+      
     - Effect: Allow
       Action:
         - dynamodb:Query
@@ -233,9 +240,19 @@ resources:
         AttributeDefinitions:
           - AttributeName: postId
             AttributeType: S
+          - AttributeName: userId
+            AttributeType: S
         KeySchema:
           - AttributeName: postId
             KeyType: HASH
+        GlobalSecondaryIndexes:
+        - IndexName: ${self:provider.environment.POST_INDEX_NAME}
+          KeySchema:
+            - AttributeName: userId
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+    
         StreamSpecification:
           StreamViewType: NEW_IMAGE
     
